@@ -46,6 +46,7 @@
 - `platform-bom`：唯一第三方依赖版本入口（业务模块禁止显式写版本号）
 - `platform-kernel`：最小内核（错误码/异常模型/结果模型/ID/时间/序列化约定）；严禁 Spring 依赖
 - `platform-spi-*`：端口层（cache/mq/blob/lock/notify/search/featureflag...），只放接口与 DTO
+- `platform-spi-flow` + `platform-flow-core`：模块化业务编排 SPI + DAG 执行引擎（按需装配步骤、可组合/可重试/可观测）
 - `platform-adapter-*`：SPI 具体实现（redis/kafka/s3/es...），可替换/可并存
 - `platform-starter-*`：Spring Boot 自动装配与平台约定（web/security/persistence/reliability/observability...）
 - `platform-observability-hub`（可选应用）：集中汇总与总览（版本/健康/依赖矩阵/指标聚合等）

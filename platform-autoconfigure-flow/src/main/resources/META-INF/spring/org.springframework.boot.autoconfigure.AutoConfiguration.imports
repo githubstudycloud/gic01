@@ -1,0 +1,2 @@
+com.test.platform.flow.autoconfigure.PlatformFlowAutoConfiguration
+com.test.platform.flow.autoconfigure.web.PlatformFlowWebAutoConfiguration

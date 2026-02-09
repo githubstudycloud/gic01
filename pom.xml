@@ -30,10 +30,13 @@
     <module>platform-bom</module>
     <module>platform-kernel</module>
     <module>platform-spi-lock</module>
+    <module>platform-spi-flow</module>
+    <module>platform-flow-core</module>
     <module>platform-adapter-lock-local</module>
     <module>platform-adapter-lock-redis</module>
     <module>platform-autoconfigure-lock</module>
     <module>platform-autoconfigure-lock-redis</module>
+    <module>platform-autoconfigure-flow</module>
     <module>platform-autoconfigure-logging</module>
     <module>platform-autoconfigure-observability</module>
     <module>platform-autoconfigure-tracing-otel</module>
@@ -41,6 +44,7 @@
     <module>platform-starter-observability</module>
     <module>platform-starter-lock</module>
     <module>platform-starter-lock-redis</module>
+    <module>platform-starter-flow</module>
     <module>platform-starter-tracing-otel</module>
     <module>platform-observability-hub-core</module>
     <module>platform-observability-hub</module>
