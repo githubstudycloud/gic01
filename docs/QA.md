@@ -92,3 +92,37 @@ A（结果摘要）:
 - 新增 `platform-observability-hub`：Spring Boot 应用层，对外提供：
   - `GET /hub/services`：列出被观测服务清单（来自配置 `platform.hub.services`）
   - `GET /hub/snapshot`：并行抓取并返回快照列表（含 health/info、状态码、错误信息）
+
+## 2026-02-09 - 补充需求纳入：新手引导/文档版本/统一规范/链路追踪与日志/团队人机协作
+
+Q（新增约束/目标）:
+- 增加项目新手引导
+- 文档版本管理（可回溯、可审计）
+- 链路追踪、统一日志管理查看、本地调试轻量化、系统状态监控、统一代码规范
+- 前端与后端接口注册/通信管理（后续要做）
+- Vue 框架（后续要做）
+- Python 测试框架（后续要做）
+- 团队成员与多个 AI 协作同一仓库
+
+A（本次已落地）:
+- 新手引导/协作治理：
+  - `docs/getting-started.md`：10 分钟上手（构建/运行/验证/替换命名空间）
+  - `AGENTS.md`：人+AI 协作规则（含必须追加 `docs/QA.md` 存档）
+  - `CONTRIBUTING.md`：模块边界、验证链路、依赖治理原则
+- 文档版本管理：
+  - `docs/doc-versioning.md`：文档随代码发布的版本化策略
+  - `docs/adr/`：ADR 模板与规范
+  - `docs/releases/` + `CHANGELOG.md`：发布说明与变更摘要骨架
+- 统一代码规范（轻量但可强制）：
+  - `.editorconfig` + Maven `spotless`（validate 阶段检查，`mvn spotless:apply` 修复）
+  - GitHub Actions：`ci.yml`（JDK 17/21 跑 `mvn test`）+ `nightly.yml`（`-Pit verify`）
+- 观测（链路追踪/日志/状态监控）：
+  - `platform-starter-logging` + `platform-autoconfigure-logging`：默认结构化 JSON 日志（可用 `platform.logging.enabled=false` 关闭）
+  - `platform-starter-tracing-otel` + `platform-autoconfigure-tracing-otel`：提供 Micrometer Tracer + OTel SDK/OTLP exporter + 观测 handler 绑定
+  - `platform-starter-observability` 聚合 logging + tracing + Prometheus registry（`/actuator/prometheus`）
+  - 本地观测栈：`platform-deploy/compose/docker-compose.observability.yml`（Grafana + Prometheus + Tempo + OTLP collector）
+
+A（后续待补全的方向）:
+- 前后端接口注册/通信管理：OpenAPI 合同/registry/生成 TS client + 契约测试（计划引入）
+- Vue 脚手架：Vue3 + Vite + TS + 生成的 API client（计划引入）
+- Python 测试：pytest/httpx（黑盒 + 契约 + 并发），与 `platform-loadtest`（k6/Gatling）协同（计划引入）
