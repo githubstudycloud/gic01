@@ -190,3 +190,16 @@ A（本次已落地）:
 - 为压测场景补充后端接口能力：
   - `platform-sample-app` 的 `/demo/lock` 支持可选 `holdMillis`（并做上限保护），并同步更新 OpenAPI 合同与前端生成类型
 - 文档补充：`docs/getting-started.md` 增加并发/集群验证入口说明
+
+## 2026-02-09 - 统一日志查看：本地 Loki + Promtail（可选）
+
+Q（落地动作）:
+- 为本地调试补齐“统一日志管理查看”的最小闭环，与 metrics/traces 栈一致，且不影响默认 PR 验证。
+
+A（本次已落地）:
+- `platform-deploy/compose/docker-compose.observability.yml` 增加 Loki + Promtail：
+  - Loki：存储/查询日志（Grafana Explore）
+  - Promtail：抓取 Docker 容器日志并推送到 Loki（通过 docker socket）
+- Grafana provisioning 增加 Loki datasource：`platform-deploy/compose/observability/grafana/provisioning/datasources/datasources.yml`
+- Promtail 配置：`platform-deploy/compose/observability/promtail.yml`（基础标签：container/compose_service/compose_project/stream）
+- 文档更新：`platform-deploy/README.md`、`docs/getting-started.md`（说明：host 方式运行的应用日志不会自动进 Loki，需用 Docker/Compose 运行）

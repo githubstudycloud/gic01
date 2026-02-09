@@ -74,7 +74,7 @@ Hub 会根据配置拉取各服务的 actuator 输出并汇总（health/info）�
 ## 7. 本地可观测（可选）
 
 - 默认日志为结构化 JSON（便于采集/检索）；如需本地更“轻”，可设置 `platform.logging.enabled=false`。
-- 可用 `platform-deploy/compose/docker-compose.observability.yml` 一键启动本地 metrics + tracing 栈。
+- 可用 `platform-deploy/compose/docker-compose.observability.yml` 一键启动本地 metrics + tracing + logs 栈。
 
 ## 8. Vue 前端（可选）
 
