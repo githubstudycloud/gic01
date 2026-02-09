@@ -211,12 +211,13 @@ Q（落地动作）:
 
 A（本次已落地）:
 - 新增依赖年龄审计脚本：
-  - `scripts/deps-age-audit.py`：通过 Maven Central timestamp 计算依赖发布年龄，超龄则要求 vendored
+  - `scripts/deps-age-audit.py`：通过 Maven Central 上 POM 的 `Last-Modified` 估算依赖发布年龄，超龄则要求 vendored
   - `scripts/deps-age-audit.ps1`、`scripts/deps-age-audit.sh`：一键入口
   - 默认检查 direct runtime deps；可用 `--include-transitive` 扩展到全量传递依赖
   - 可用 `--vendor` 自动从本地 `~/.m2` 复制 jar+pom 到 `platform-thirdparty-repo/`（Maven file repo 结构）
 - 新增例外清单模板：`platform-deps-metadata/age-exceptions.json`
 - 文档更新：`platform-deps-metadata/README.md`、`CONTRIBUTING.md`
+- Nightly CI（非 PR fast path）增加依赖年龄审计：`.github/workflows/nightly.yml`
 
 ## 2026-02-09 - Helm 部署修正：资源命名与 release 对齐
 

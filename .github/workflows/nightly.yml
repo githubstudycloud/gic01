@@ -21,3 +21,5 @@ jobs:
       - name: Maven verify (unit + IT)
         run: mvn -q -Pit verify
 
+      - name: Dependency age audit (3-year rule)
+        run: python scripts/deps-age-audit.py
