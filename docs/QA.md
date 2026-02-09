@@ -126,3 +126,20 @@ A（后续待补全的方向）:
 - 前后端接口注册/通信管理：OpenAPI 合同/registry/生成 TS client + 契约测试（计划引入）
 - Vue 脚手架：Vue3 + Vite + TS + 生成的 API client（计划引入）
 - Python 测试：pytest/httpx（黑盒 + 契约 + 并发），与 `platform-loadtest`（k6/Gatling）协同（计划引入）
+
+## 2026-02-09 - 前后端接口注册/通信管理：OpenAPI 合同 + API Registry
+
+Q（落地动作）:
+- 将“前端与后端接口注册/通信管理”纳入基座设计，要求可最小化验证、可独立模块验证、可扩展。
+
+A（本次已落地）:
+- OpenAPI 合同约定：
+  - 约定每个服务对外暴露稳定的 OpenAPI URL（默认 `/openapi.yaml`）
+  - `platform-sample-app` 已提供静态合同：`platform-sample-app/src/main/resources/static/openapi.yaml`
+- API Registry（可选独立服务）：
+  - `platform-api-registry-core`：无 Spring 的核心抓取/摘要逻辑（HttpClient + 并行抓取 + sha256 摘要）
+  - `platform-api-registry`：Spring Boot 应用（8082），对外提供：
+    - `GET /registry/apis`：服务清单与 spec URL
+    - `GET /registry/snapshot`：并行抓取快照（HTTP 状态 + digest）
+    - `GET /registry/spec/{name}`：代理返回原始 spec
+- 使用说明文档：`docs/api-contracts-and-registry.md`
