@@ -1,0 +1,25 @@
+# Maven
+**/target/
+.mvn/timing.properties
+
+# IDEs
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# Gradle
+**/.gradle/
+**/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Windows reserved device name; keep out of git to avoid checkout issues.
+nul
+NUL

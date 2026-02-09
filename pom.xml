@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    Single-source namespace:
+    - Keep groupId defined only here so it is easy to replace later (pre-release constraint).
+    - All modules inherit groupId/version unless they are explicitly published separately.
+  -->
+  <groupId>com.test.platform</groupId>
+  <artifactId>platform-root</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>platform-root</name>
+  <description>Enterprise platform foundation (platform-*)</description>
+
+  <properties>
+    <!-- Spring Boot 4.x baseline; upgrade by changing this single property. -->
+    <spring-boot.version>4.0.2</spring-boot.version>
+  </properties>
+
+  <modules>
+    <module>platform-parent</module>
+    <module>platform-bom</module>
+    <module>platform-kernel</module>
+    <module>platform-autoconfigure-observability</module>
+    <module>platform-starter-observability</module>
+  </modules>
+</project>
