@@ -94,3 +94,15 @@ npm run dev
 ```
 
 打开：`http://localhost:5173`
+
+## 9. Python 黑盒测试（可选）
+
+先启动后端样例（同上），然后：
+
+```bash
+cd platform-test-python
+python -m venv .venv
+.venv\\Scripts\\activate
+pip install -r requirements.txt
+pytest
+```

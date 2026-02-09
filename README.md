@@ -9,6 +9,7 @@ and "starter-first" ergonomics for Spring Boot 4.x.
 - Architecture blueprint: `docs/platform-blueprint.md`
 - API contracts/registry: `docs/api-contracts-and-registry.md`
 - Vue frontend: `platform-frontend-vue/`
+- Python tests: `platform-test-python/`
 - Contribution rules: `CONTRIBUTING.md` (module boundaries + dependency policy)
 - Multi-agent guide: `AGENTS.md` (humans + AIs)
 
