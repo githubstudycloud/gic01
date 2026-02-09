@@ -42,6 +42,14 @@ paths:
             default: 5
             minimum: 1
             maximum: 60
+        - name: holdMillis
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 0
+            maximum: 10000
       responses:
         "200":
           description: Lock result
@@ -64,4 +72,3 @@ components:
           type: string
         acquired:
           type: boolean
-

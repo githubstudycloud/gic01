@@ -84,6 +84,7 @@ export interface operations {
             query: {
                 name: string;
                 ttlSeconds?: number;
+                holdMillis?: number;
             };
             header?: never;
             path?: never;
