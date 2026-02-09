@@ -1,0 +1,25 @@
+replicaCount: 2
+
+image:
+  repository: "platform/service"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources: {}
+
+env: []
+
+readinessProbe:
+  path: /actuator/health/readiness
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+livenessProbe:
+  path: /actuator/health/liveness
+  initialDelaySeconds: 10
+  periodSeconds: 10
+

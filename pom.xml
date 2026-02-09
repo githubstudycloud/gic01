@@ -35,5 +35,6 @@
     <module>platform-starter-observability</module>
     <module>platform-starter-lock</module>
     <module>platform-starter-lock-redis</module>
+    <module>platform-sample-app</module>
   </modules>
 </project>

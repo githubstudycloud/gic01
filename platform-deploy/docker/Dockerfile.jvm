@@ -1,0 +1,13 @@
+ARG JAVA_VERSION=21
+FROM eclipse-temurin:${JAVA_VERSION}-jre
+
+WORKDIR /app
+
+ARG JAR_FILE=app.jar
+COPY ${JAR_FILE} app.jar
+
+ENV JAVA_OPTS=""
+EXPOSE 8080
+
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
+

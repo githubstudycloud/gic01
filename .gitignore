@@ -20,6 +20,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Env files
+.env
+**/.env
+
 # Windows reserved device name; keep out of git to avoid checkout issues.
 nul
 NUL

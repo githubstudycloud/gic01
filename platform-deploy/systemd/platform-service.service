@@ -1,0 +1,17 @@
+[Unit]
+Description=platform service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=platform
+WorkingDirectory=/opt/platform
+EnvironmentFile=-/etc/platform/platform-service.env
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/platform/app.jar
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+

@@ -69,3 +69,15 @@ A（结果摘要）:
 - 新增 autoconfigure + starter：
   - `platform-autoconfigure-lock` + `platform-starter-lock`：默认 `platform.lock.provider=local`。
   - `platform-autoconfigure-lock-redis` + `platform-starter-lock-redis`：当 `platform.lock.provider=redis` 且存在 `StringRedisTemplate` 时装配 Redis 实现。
+
+## 2026-02-09 - 补全 platform-deploy：一键多方式部署（docker/compose/k8s/systemd）
+
+Q（落地动作）:
+- 按顺序补全一键式多方式部署能力，并尽量最小化发布验证成本。
+
+A（结果摘要）:
+- 新增 `platform-deploy/` 的可复用部署骨架：
+  - `platform-deploy/deploy.ps1` / `platform-deploy/deploy.sh`：支持 `docker|compose|k8s|baremetal` 四种模式的一键部署入口。
+  - `platform-deploy/verify-http.ps1` / `platform-deploy/verify-http.sh`：部署后以 HTTP health URL 做最小发布验证（默认 readiness 探针）。
+  - Dockerfile / Compose / Helm Chart / systemd 模板：`platform-deploy/docker/`、`platform-deploy/compose/`、`platform-deploy/helm/`、`platform-deploy/systemd/`。
+- 新增 `platform-sample-app`：用于验证 starter 与部署模板的最小可运行样例（含 `/demo/ping`、`/demo/lock` 与 actuator probes）。
