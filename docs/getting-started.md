@@ -27,6 +27,14 @@ mvn -q -Pit verify
 mvn -q -Pjava21 test
 ```
 
+## 1.5 一键“发布前验证”（可选）
+
+将构建 + 依赖政策 +（可选）Docker 启动检查 +（可选）k6/Python 黑盒验证串起来：
+
+```powershell
+./scripts/release-verify.ps1 -Level standard
+```
+
 ## 2. 跑一个最小可运行样例
 
 ```bash

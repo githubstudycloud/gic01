@@ -33,4 +33,6 @@ Write-Host "  IncludeTransitive:  $IncludeTransitive"
 Write-Host "  Vendor:             $Vendor"
 
 python @argsList
-
+if ($LASTEXITCODE -ne 0) {
+  throw "Dependency age audit failed with exit code $LASTEXITCODE"
+}

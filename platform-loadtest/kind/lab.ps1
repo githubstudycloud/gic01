@@ -16,6 +16,12 @@ function RequireCommand([string]$name) {
   }
 }
 
+function RequireLastExitCode([string]$what) {
+  if ($LASTEXITCODE -ne 0) {
+    throw "$what failed with exit code $LASTEXITCODE"
+  }
+}
+
 RequireCommand kind
 RequireCommand docker
 RequireCommand kubectl
@@ -31,12 +37,14 @@ $clusters = kind get clusters
 if ($clusters -notcontains $ClusterName) {
   Write-Host "Creating kind cluster: $ClusterName"
   kind create cluster --name $ClusterName --config $kindConfig | Out-Host
+  RequireLastExitCode "kind create cluster"
 } else {
   Write-Host "Kind cluster already exists: $ClusterName"
 }
 
 Write-Host "Building sample app jar..."
 mvn -q -pl platform-sample-app -DskipTests package
+RequireLastExitCode "mvn package"
 
 $jar = Get-ChildItem (Join-Path $repoRoot "platform-sample-app\\target") -Filter "platform-sample-app-*.jar" |
   Where-Object { $_.Name -notlike "*sources*" -and $_.Name -notlike "*javadoc*" } |
@@ -56,9 +64,11 @@ docker build `
   --build-arg "JAR_FILE=platform-sample-app/target/$($jar.Name)" `
   -t $image `
   $repoRoot | Out-Host
+RequireLastExitCode "docker build"
 
 Write-Host "Loading image into kind: $image"
 kind load docker-image $image --name $ClusterName | Out-Host
+RequireLastExitCode "kind load docker-image"
 
 $repo = "platform-sample-app"
 $tag = "local"
@@ -70,10 +80,11 @@ helm upgrade --install $Release $chartPath `
   --set "image.repository=$repo" `
   --set "image.tag=$tag" `
   --set "service.port=8080" | Out-Host
+RequireLastExitCode "helm upgrade"
 
 kubectl rollout status "deployment/$Release" -n $Namespace --timeout "120s" | Out-Host
+RequireLastExitCode "kubectl rollout status"
 
 Write-Host ""
 Write-Host "Next (port-forward the service):"
 Write-Host "  kubectl -n $Namespace port-forward svc/$Release 8080:8080"
-

@@ -46,3 +46,6 @@ docker run --rm `
   -e "VUS=$Vus" `
   -e "DURATION=$Duration" `
   $K6Image run "/scripts/$Script.js"
+if ($LASTEXITCODE -ne 0) {
+  throw "k6 failed with exit code $LASTEXITCODE"
+}

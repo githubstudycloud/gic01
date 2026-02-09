@@ -34,6 +34,12 @@ function RequireCommand([string]$name) {
   }
 }
 
+function RequireLastExitCode([string]$what) {
+  if ($LASTEXITCODE -ne 0) {
+    throw "$what failed with exit code $LASTEXITCODE"
+  }
+}
+
 function GetRepoRoot() {
   return (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 }
@@ -68,6 +74,7 @@ if ([string]::IsNullOrWhiteSpace($Image) -and -not [string]::IsNullOrWhiteSpace(
     --build-arg "JAR_FILE=$jarRel" `
     -t $imageTag `
     $repoRoot | Out-Host
+  RequireLastExitCode "docker build"
 
   $Image = $imageTag
 }
@@ -82,6 +89,7 @@ switch ($Mode) {
     Write-Host "Deploying via Docker: $ServiceName ($Image)"
     docker rm -f $ServiceName 2>$null | Out-Null
     docker run -d --name $ServiceName -p "$HostPort`:$ContainerPort" $Image | Out-Null
+    RequireLastExitCode "docker run"
 
     & (Join-Path $PSScriptRoot "verify-http.ps1") -Url $HealthUrl -TimeoutSeconds $HealthTimeoutSeconds
   }
@@ -97,6 +105,7 @@ switch ($Mode) {
 
     Write-Host "Deploying via Docker Compose: $ServiceName ($Image)"
     docker compose -f $ComposePath --project-name $ServiceName up -d | Out-Host
+    RequireLastExitCode "docker compose up"
 
     & (Join-Path $PSScriptRoot "verify-http.ps1") -Url $HealthUrl -TimeoutSeconds $HealthTimeoutSeconds
   }
@@ -121,8 +130,10 @@ switch ($Mode) {
       --set "image.repository=$repo" `
       --set "image.tag=$tag" `
       --set "service.port=$ContainerPort" | Out-Host
+    RequireLastExitCode "helm upgrade"
 
     kubectl rollout status "deployment/$Release" -n $Namespace --timeout "$HealthTimeoutSeconds`s" | Out-Host
+    RequireLastExitCode "kubectl rollout status"
     Write-Host "K8s rollout OK. (Optional) verify via your ingress or port-forward."
   }
 

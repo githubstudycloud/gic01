@@ -16,7 +16,7 @@ while ((Get-Date) -lt $deadline) {
     $response = Invoke-WebRequest -Uri $Url -Method Get -TimeoutSec 5
     if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 300) {
       Write-Host "OK: $Url ($($response.StatusCode))"
-      exit 0
+      return
     }
   } catch {
     # keep retrying until timeout
@@ -25,4 +25,3 @@ while ((Get-Date) -lt $deadline) {
 }
 
 throw "Health check failed after $TimeoutSeconds seconds: $Url"
-

@@ -217,3 +217,29 @@ A（本次已落地）:
   - 可用 `--vendor` 自动从本地 `~/.m2` 复制 jar+pom 到 `platform-thirdparty-repo/`（Maven file repo 结构）
 - 新增例外清单模板：`platform-deps-metadata/age-exceptions.json`
 - 文档更新：`platform-deps-metadata/README.md`、`CONTRIBUTING.md`
+
+## 2026-02-09 - Helm 部署修正：资源命名与 release 对齐
+
+Q（落地动作）:
+- 修正 Helm chart 资源命名策略，使“一键 Helm 部署/回滚/rollout gate”按 release 名称直观工作（deployment/svc 名称可预测），并避免同命名冲突。
+
+A（本次已落地）:
+- Helm chart 默认使用 `.Release.Name` 作为资源名（deployment/service），并保留 `fullnameOverride` 以便特殊场景覆盖：
+  - `platform-deploy/helm/platform-service/templates/_helpers.tpl`
+- 文档补充：`platform-deploy/README.md` 说明 release 名与 k8s 资源名的映射关系
+
+## 2026-02-09 - 发布前验证：release-verify 一键脚本（opt-in）
+
+Q（落地动作）:
+- 增加“一键发布前验证”入口：尽量复用现有最小验证链路，同时把可选的运行态验证（Docker 启动门禁、k6、Python 黑盒）串起来，便于发布前快速复核。
+
+A（本次已落地）:
+- 新增脚本：
+  - `scripts/release-verify.ps1`：Level=fast/standard/full；standard 默认跑 `mvn -Pit verify` + 依赖年龄审计 +（可选）Docker/k6/Python
+  - `scripts/release-verify.sh`：Bash 版本（同逻辑，面向 Linux/macOS）
+- 脚本健壮性（避免“子脚本 exit 导致上层脚本提前退出”）：
+  - `platform-deploy/verify-http.ps1` 改为 `return`（可被其它脚本安全调用）
+  - `platform-deploy/deploy.ps1`、`platform-loadtest/run-k6.ps1`、`platform-loadtest/kind/lab.ps1`、`scripts/deps-age-audit.ps1` 对外部命令非 0 退出码 fail-fast
+- 文档补充：
+  - `docs/getting-started.md` 增加 “1.5 一键发布前验证”
+  - `CONTRIBUTING.md` 增加 Pre-release verification 入口

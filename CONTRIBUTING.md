@@ -23,6 +23,14 @@ mvn -q -Pit verify
 mvn -q -Pjava21 test
 ```
 
+## Pre-release verification (opt-in)
+
+One-command "release verification" runner (build + dependency policy + optional Docker/k6/python steps):
+
+```powershell
+./scripts/release-verify.ps1 -Level standard
+```
+
 ## Module Rules (Non-Negotiable)
 
 - `platform-kernel`:
