@@ -203,3 +203,17 @@ A（本次已落地）:
 - Grafana provisioning 增加 Loki datasource：`platform-deploy/compose/observability/grafana/provisioning/datasources/datasources.yml`
 - Promtail 配置：`platform-deploy/compose/observability/promtail.yml`（基础标签：container/compose_service/compose_project/stream）
 - 文档更新：`platform-deploy/README.md`、`docs/getting-started.md`（说明：host 方式运行的应用日志不会自动进 Loki，需用 Docker/Compose 运行）
+
+## 2026-02-09 - 依赖治理：三年规则审计脚本（opt-in）
+
+Q（落地动作）:
+- 增加可执行的依赖年龄门禁：默认不影响 PR fast path，但发布前/CI 可一键检查；超过 3 年的依赖要求 vendor 到本地 repo 便于自维护。
+
+A（本次已落地）:
+- 新增依赖年龄审计脚本：
+  - `scripts/deps-age-audit.py`：通过 Maven Central timestamp 计算依赖发布年龄，超龄则要求 vendored
+  - `scripts/deps-age-audit.ps1`、`scripts/deps-age-audit.sh`：一键入口
+  - 默认检查 direct runtime deps；可用 `--include-transitive` 扩展到全量传递依赖
+  - 可用 `--vendor` 自动从本地 `~/.m2` 复制 jar+pom 到 `platform-thirdparty-repo/`（Maven file repo 结构）
+- 新增例外清单模板：`platform-deps-metadata/age-exceptions.json`
+- 文档更新：`platform-deps-metadata/README.md`、`CONTRIBUTING.md`

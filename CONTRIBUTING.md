@@ -58,9 +58,13 @@ Design constraint: dependencies should be released within the last 36 months.
 If a dependency is older, it must be vendored into `platform-thirdparty-repo/` and recorded in
 `platform-deps-metadata/` with release date/source/license/replacement plan.
 
+Opt-in check:
+- `scripts/deps-age-audit.ps1` (or `scripts/deps-age-audit.sh`)
+  - default: checks direct runtime deps
+  - `-Vendor` / `VENDOR=1`: auto-vendor from local `~/.m2` into `platform-thirdparty-repo/`
+
 Enforcement may be staged behind opt-in profiles initially to keep PR validation minimal.
 
 ## Multi-Agent Collaboration
 
 See `AGENTS.md` for collaboration rules and the required `docs/QA.md` session archive entry.
-
