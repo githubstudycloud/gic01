@@ -81,3 +81,14 @@ A（结果摘要）:
   - `platform-deploy/verify-http.ps1` / `platform-deploy/verify-http.sh`：部署后以 HTTP health URL 做最小发布验证（默认 readiness 探针）。
   - Dockerfile / Compose / Helm Chart / systemd 模板：`platform-deploy/docker/`、`platform-deploy/compose/`、`platform-deploy/helm/`、`platform-deploy/systemd/`。
 - 新增 `platform-sample-app`：用于验证 starter 与部署模板的最小可运行样例（含 `/demo/ping`、`/demo/lock` 与 actuator probes）。
+
+## 2026-02-09 - 补全 observability-hub：服务自监听汇总（可选独立运行）
+
+Q（落地动作）:
+- 按顺序补全 `platform-observability-hub`，用于汇总各服务 actuator 输出（health/info），作为可选独立服务运行。
+
+A（结果摘要）:
+- 新增 `platform-observability-hub-core`：纯库层聚合能力（基于 Java `HttpClient` 拉取 `/actuator/health[/readiness]` 与 `/actuator/info`，并行抓取、超时控制、输出 `ServiceSnapshot`）。
+- 新增 `platform-observability-hub`：Spring Boot 应用层，对外提供：
+  - `GET /hub/services`：列出被观测服务清单（来自配置 `platform.hub.services`）
+  - `GET /hub/snapshot`：并行抓取并返回快照列表（含 health/info、状态码、错误信息）
