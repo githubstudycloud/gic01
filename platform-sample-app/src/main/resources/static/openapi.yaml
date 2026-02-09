@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: platform-sample-app
+  version: 0.1.0-SNAPSHOT
+paths:
+  /demo/ping:
+    get:
+      summary: Ping
+      operationId: ping
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok:
+                    type: boolean
+  /demo/lock:
+    get:
+      summary: Try lock
+      operationId: tryLock
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: ttlSeconds
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 5
+            minimum: 1
+            maximum: 60
+      responses:
+        "200":
+          description: Lock result
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LockResult"
+components:
+  schemas:
+    LockResult:
+      type: object
+      required: [name, acquired]
+      properties:
+        name:
+          type: string
+        acquired:
+          type: boolean
+

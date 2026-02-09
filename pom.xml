@@ -44,6 +44,8 @@
     <module>platform-starter-tracing-otel</module>
     <module>platform-observability-hub-core</module>
     <module>platform-observability-hub</module>
+    <module>platform-api-registry-core</module>
+    <module>platform-api-registry</module>
     <module>platform-sample-app</module>
   </modules>
 
