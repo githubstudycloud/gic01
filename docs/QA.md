@@ -244,3 +244,28 @@ A（本次已落地）:
 - 文档补充：
   - `docs/getting-started.md` 增加 “1.5 一键发布前验证”
   - `CONTRIBUTING.md` 增加 Pre-release verification 入口
+
+## 2026-02-09 - 业务可插拔模块化编排：Flow 引擎 + 业务样例 + 前端看板 + Python 黑盒验证
+
+Q（落地动作）:
+- 业务快速解耦式接入：按需加载模块化（类似 skill），支持顺序/并发/汇流的业务编排
+- 给出 3-4 个业务测试项目：采集度量（DAG）、CRUD 聚合、工作流、聚合看板/跟踪；支持重试与部分更新组合
+- 系统自身接口监控测试：可快速跑黑盒验证
+
+A（本次已落地）:
+- Flow 基建（DAG 编排 + 运行追踪）:
+  - `platform-spi-flow`：step/flow SPI（禁止依赖 Spring/Jakarta）
+  - `platform-flow-core`：DAG 引擎 + in-memory run/artifacts store
+  - `platform-autoconfigure-flow` + `platform-starter-flow`：Spring Boot 自动装配与 Web API
+- Flow Web API：
+  - `GET /flows`、`POST /flows/{flowId}/runs`、`GET /flows/{flowId}/runs/{runId}`、`POST /flows/{flowId}/runs/{runId}/retry`
+  - 新增 `GET /flows/{flowId}/runs/{runId}/artifacts` 便于调试/看板展示
+- 业务样例模块（可插拔 auto-configuration，按依赖“组合成一组”）：
+  - 采集度量：`platform-sample-biz-metrics-collector` + `platform-sample-biz-metrics-measure` + `platform-sample-biz-metrics-flow`（flowId=`demo.metrics`）
+  - 工作流：`platform-sample-biz-workflow`（flowId=`demo.workflow.release`，支持 `failStepId` 注入失败用于验证重试）
+  - CRUD：`platform-sample-biz-crud`（`/crud/todos`）
+- 统一合同/调试：
+  - `platform-sample-app` 引入 starter-flow + 业务样例模块，并扩展 `openapi.yaml` 覆盖 flows/crud
+  - `platform-frontend-vue` 重新生成 OpenAPI types，并新增 Flows/Todos 调试看板（启动/重试/查看 artifacts）
+- Python 黑盒验证：
+  - `platform-test-python` 增加 `test_flow.py`、`test_crud.py`，用于接口监控与快速回归
