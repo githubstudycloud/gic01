@@ -10,32 +10,31 @@ import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public final class PlatformRequestIdFilter extends OncePerRequestFilter {
-  private final PlatformRequestIdProperties properties;
+	private final PlatformRequestIdProperties properties;
 
-  public PlatformRequestIdFilter(PlatformRequestIdProperties properties) {
-    this.properties = properties;
-  }
+	public PlatformRequestIdFilter(PlatformRequestIdProperties properties) {
+		this.properties = properties;
+	}
 
-  @Override
-  protected void doFilterInternal(
-      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-      throws ServletException, IOException {
-    String requestId = request.getHeader(properties.getHeaderName());
-    if ((requestId == null || requestId.isBlank()) && properties.isGenerateIfMissing()) {
-      requestId = UUID.randomUUID().toString().replace("-", "");
-    }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		String requestId = request.getHeader(properties.getHeaderName());
+		if ((requestId == null || requestId.isBlank()) && properties.isGenerateIfMissing()) {
+			requestId = UUID.randomUUID().toString().replace("-", "");
+		}
 
-    if (requestId == null || requestId.isBlank()) {
-      filterChain.doFilter(request, response);
-      return;
-    }
+		if (requestId == null || requestId.isBlank()) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-    MDC.put(properties.getMdcKey(), requestId);
-    response.setHeader(properties.getHeaderName(), requestId);
-    try {
-      filterChain.doFilter(request, response);
-    } finally {
-      MDC.remove(properties.getMdcKey());
-    }
-  }
+		MDC.put(properties.getMdcKey(), requestId);
+		response.setHeader(properties.getHeaderName(), requestId);
+		try {
+			filterChain.doFilter(request, response);
+		} finally {
+			MDC.remove(properties.getMdcKey());
+		}
+	}
 }

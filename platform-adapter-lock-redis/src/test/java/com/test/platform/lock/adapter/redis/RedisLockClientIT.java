@@ -15,43 +15,37 @@ import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 
 class RedisLockClientIT {
-  @Test
-  void providesMutualExclusionWithUnlock() {
-    Assumptions.assumeTrue(
-        DockerClientFactory.instance().isDockerAvailable(), "Docker is required for this IT");
+	@Test
+	void providesMutualExclusionWithUnlock() {
+		Assumptions.assumeTrue(DockerClientFactory.instance().isDockerAvailable(), "Docker is required for this IT");
 
-    GenericContainer<?> redisContainer =
-        new GenericContainer<>("redis:7-alpine").withExposedPorts(6379);
-    redisContainer.start();
-    try {
-      LettuceConnectionFactory connectionFactory =
-          new LettuceConnectionFactory(
-              redisContainer.getHost(), redisContainer.getFirstMappedPort());
-      connectionFactory.afterPropertiesSet();
-      try {
-        StringRedisTemplate template = new StringRedisTemplate(connectionFactory);
-        template.afterPropertiesSet();
+		GenericContainer<?> redisContainer = new GenericContainer<>("redis:7-alpine").withExposedPorts(6379);
+		redisContainer.start();
+		try {
+			LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisContainer.getHost(),
+					redisContainer.getFirstMappedPort());
+			connectionFactory.afterPropertiesSet();
+			try {
+				StringRedisTemplate template = new StringRedisTemplate(connectionFactory);
+				template.afterPropertiesSet();
 
-        RedisLockClient client = new RedisLockClient(template, "platform:lock:");
-        Optional<LockHandle> first =
-            client.tryLock(LockRequest.once("x", Duration.ofSeconds(5)));
-        assertTrue(first.isPresent());
+				RedisLockClient client = new RedisLockClient(template, "platform:lock:");
+				Optional<LockHandle> first = client.tryLock(LockRequest.once("x", Duration.ofSeconds(5)));
+				assertTrue(first.isPresent());
 
-        Optional<LockHandle> second =
-            client.tryLock(LockRequest.once("x", Duration.ofSeconds(5)));
-        assertFalse(second.isPresent());
+				Optional<LockHandle> second = client.tryLock(LockRequest.once("x", Duration.ofSeconds(5)));
+				assertFalse(second.isPresent());
 
-        first.get().close();
+				first.get().close();
 
-        Optional<LockHandle> third =
-            client.tryLock(LockRequest.once("x", Duration.ofSeconds(5)));
-        assertTrue(third.isPresent());
-        third.get().close();
-      } finally {
-        connectionFactory.destroy();
-      }
-    } finally {
-      redisContainer.stop();
-    }
-  }
+				Optional<LockHandle> third = client.tryLock(LockRequest.once("x", Duration.ofSeconds(5)));
+				assertTrue(third.isPresent());
+				third.get().close();
+			} finally {
+				connectionFactory.destroy();
+			}
+		} finally {
+			redisContainer.stop();
+		}
+	}
 }

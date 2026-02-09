@@ -9,20 +9,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HubController {
-  private final HubSnapshotService snapshotService;
+	private final HubSnapshotService snapshotService;
 
-  public HubController(HubSnapshotService snapshotService) {
-    this.snapshotService = snapshotService;
-  }
+	public HubController(HubSnapshotService snapshotService) {
+		this.snapshotService = snapshotService;
+	}
 
-  @GetMapping("/hub/services")
-  public List<ObservedService> services() {
-    return snapshotService.services();
-  }
+	@GetMapping("/hub/services")
+	public List<ObservedService> services() {
+		return snapshotService.services();
+	}
 
-  @GetMapping("/hub/snapshot")
-  public List<ServiceSnapshot> snapshot() {
-    return snapshotService.snapshot();
-  }
+	@GetMapping("/hub/snapshot")
+	public List<ServiceSnapshot> snapshot() {
+		return snapshotService.snapshot();
+	}
 }
-

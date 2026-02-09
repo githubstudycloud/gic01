@@ -18,12 +18,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 @ConditionalOnClass(StringRedisTemplate.class)
 public class PlatformRedisLockAutoConfiguration {
 
-  @Bean
-  @ConditionalOnMissingBean(LockClient.class)
-  @ConditionalOnBean(StringRedisTemplate.class)
-  public LockClient platformRedisLockClient(
-      StringRedisTemplate stringRedisTemplate, PlatformLockProperties properties) {
-    return new RedisLockClient(stringRedisTemplate, properties.getRedis().getKeyPrefix());
-  }
+	@Bean
+	@ConditionalOnMissingBean(LockClient.class)
+	@ConditionalOnBean(StringRedisTemplate.class)
+	public LockClient platformRedisLockClient(StringRedisTemplate stringRedisTemplate,
+			PlatformLockProperties properties) {
+		return new RedisLockClient(stringRedisTemplate, properties.getRedis().getKeyPrefix());
+	}
 }
-

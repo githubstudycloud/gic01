@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(HubProperties.class)
 public class HubWiring {
-  @Bean
-  @ConditionalOnMissingBean(ObjectMapper.class)
-  public ObjectMapper objectMapper() {
-    return new ObjectMapper();
-  }
+	@Bean
+	@ConditionalOnMissingBean(ObjectMapper.class)
+	public ObjectMapper objectMapper() {
+		return new ObjectMapper();
+	}
 
-  @Bean
-  public ServiceSnapshotFetcher serviceSnapshotFetcher(ObjectMapper objectMapper) {
-    return new HttpActuatorSnapshotFetcher(objectMapper);
-  }
+	@Bean
+	public ServiceSnapshotFetcher serviceSnapshotFetcher(ObjectMapper objectMapper) {
+		return new HttpActuatorSnapshotFetcher(objectMapper);
+	}
 }

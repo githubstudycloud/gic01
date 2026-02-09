@@ -1,0 +1,5 @@
+# CODEOWNERS is optional. If you want enforced review for critical files, add owners here.
+# Example:
+# /platform-parent/ @your-org/platform-maintainers
+# /platform-bom/ @your-org/platform-maintainers
+

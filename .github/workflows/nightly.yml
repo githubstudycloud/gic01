@@ -1,0 +1,23 @@
+name: nightly
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '30 17 * * *' # 01:30 (UTC+8) daily
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Maven verify (unit + IT)
+        run: mvn -q -Pit verify
+

@@ -8,11 +8,7 @@ import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(packages = "com.test.platform.lock.spi")
 class LockSpiArchitectureTest {
-  @ArchTest
-  static final ArchRule mustNotDependOnSpringOrJakarta =
-      noClasses()
-          .should()
-          .dependOnClassesThat()
-          .resideInAnyPackage("org.springframework..", "jakarta..", "javax..");
+	@ArchTest
+	static final ArchRule mustNotDependOnSpringOrJakarta = noClasses().should().dependOnClassesThat()
+			.resideInAnyPackage("org.springframework..", "jakarta..", "javax..");
 }
-

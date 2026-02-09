@@ -12,15 +12,10 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(PlatformLockProperties.class)
 public class PlatformLockAutoConfiguration {
 
-  @Bean
-  @ConditionalOnMissingBean(LockClient.class)
-  @ConditionalOnProperty(
-      prefix = "platform.lock",
-      name = "provider",
-      havingValue = "local",
-      matchIfMissing = true)
-  public LockClient platformLocalLockClient() {
-    return new LocalLockClient();
-  }
+	@Bean
+	@ConditionalOnMissingBean(LockClient.class)
+	@ConditionalOnProperty(prefix = "platform.lock", name = "provider", havingValue = "local", matchIfMissing = true)
+	public LockClient platformLocalLockClient() {
+		return new LocalLockClient();
+	}
 }
-

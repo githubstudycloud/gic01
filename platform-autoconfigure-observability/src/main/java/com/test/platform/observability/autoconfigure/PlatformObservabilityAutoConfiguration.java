@@ -15,15 +15,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @ConditionalOnClass(OncePerRequestFilter.class)
 public class PlatformObservabilityAutoConfiguration {
 
-  @Bean
-  @ConditionalOnMissingBean
-  @ConditionalOnProperty(
-      prefix = "platform.observability.request-id",
-      name = "enabled",
-      havingValue = "true",
-      matchIfMissing = true)
-  public PlatformRequestIdFilter platformRequestIdFilter(PlatformRequestIdProperties properties) {
-    return new PlatformRequestIdFilter(properties);
-  }
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty(prefix = "platform.observability.request-id", name = "enabled", havingValue = "true", matchIfMissing = true)
+	public PlatformRequestIdFilter platformRequestIdFilter(PlatformRequestIdProperties properties) {
+		return new PlatformRequestIdFilter(properties);
+	}
 }
-

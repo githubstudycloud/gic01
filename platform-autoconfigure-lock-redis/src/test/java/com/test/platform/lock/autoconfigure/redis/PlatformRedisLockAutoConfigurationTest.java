@@ -11,20 +11,15 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 class PlatformRedisLockAutoConfigurationTest {
-  private final ApplicationContextRunner contextRunner =
-      new ApplicationContextRunner()
-          .withConfiguration(AutoConfigurations.of(PlatformRedisLockAutoConfiguration.class));
+	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+			.withConfiguration(AutoConfigurations.of(PlatformRedisLockAutoConfiguration.class));
 
-  @Test
-  void registersRedisLockClientWhenProviderSelectedAndTemplateExists() {
-    contextRunner
-        .withPropertyValues("platform.lock.provider=redis")
-        .withBean(StringRedisTemplate.class, () -> mock(StringRedisTemplate.class))
-        .run(
-            context -> {
-              assertThat(context).hasSingleBean(LockClient.class);
-              assertThat(context.getBean(LockClient.class)).isInstanceOf(RedisLockClient.class);
-            });
-  }
+	@Test
+	void registersRedisLockClientWhenProviderSelectedAndTemplateExists() {
+		contextRunner.withPropertyValues("platform.lock.provider=redis")
+				.withBean(StringRedisTemplate.class, () -> mock(StringRedisTemplate.class)).run(context -> {
+					assertThat(context).hasSingleBean(LockClient.class);
+					assertThat(context.getBean(LockClient.class)).isInstanceOf(RedisLockClient.class);
+				});
+	}
 }
-

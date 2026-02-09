@@ -1,9 +1,8 @@
 package com.test.platform.lock.spi;
 
 public interface LockHandle extends AutoCloseable {
-  String name();
+	String name();
 
-  @Override
-  void close();
+	@Override
+	void close();
 }
-

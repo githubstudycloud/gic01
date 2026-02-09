@@ -1,8 +1,7 @@
 package com.test.platform.kernel.error;
 
 public interface ErrorCode {
-  String code();
+	String code();
 
-  String message();
+	String message();
 }
-

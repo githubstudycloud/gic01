@@ -8,8 +8,7 @@ import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(packages = "com.test.platform.kernel")
 class KernelArchitectureTest {
-  @ArchTest
-  static final ArchRule mustNotDependOnSpring =
-      noClasses().should().dependOnClassesThat().resideInAnyPackage("org.springframework..");
+	@ArchTest
+	static final ArchRule mustNotDependOnSpring = noClasses().should().dependOnClassesThat()
+			.resideInAnyPackage("org.springframework..");
 }
-

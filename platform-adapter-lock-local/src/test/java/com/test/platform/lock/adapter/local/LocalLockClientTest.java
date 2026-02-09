@@ -10,19 +10,18 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class LocalLockClientTest {
-  @Test
-  void allowsExclusiveLocking() {
-    LocalLockClient client = new LocalLockClient();
-    Optional<LockHandle> first = client.tryLock(LockRequest.once("a", Duration.ofSeconds(5)));
-    assertTrue(first.isPresent());
+	@Test
+	void allowsExclusiveLocking() {
+		LocalLockClient client = new LocalLockClient();
+		Optional<LockHandle> first = client.tryLock(LockRequest.once("a", Duration.ofSeconds(5)));
+		assertTrue(first.isPresent());
 
-    Optional<LockHandle> second = client.tryLock(LockRequest.once("a", Duration.ofSeconds(5)));
-    assertFalse(second.isPresent());
+		Optional<LockHandle> second = client.tryLock(LockRequest.once("a", Duration.ofSeconds(5)));
+		assertFalse(second.isPresent());
 
-    first.get().close();
-    Optional<LockHandle> third = client.tryLock(LockRequest.once("a", Duration.ofSeconds(5)));
-    assertTrue(third.isPresent());
-    third.get().close();
-  }
+		first.get().close();
+		Optional<LockHandle> third = client.tryLock(LockRequest.once("a", Duration.ofSeconds(5)));
+		assertTrue(third.isPresent());
+		third.get().close();
+	}
 }
-

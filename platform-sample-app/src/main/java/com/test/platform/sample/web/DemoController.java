@@ -11,27 +11,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DemoController {
-  private final LockClient lockClient;
+	private final LockClient lockClient;
 
-  public DemoController(LockClient lockClient) {
-    this.lockClient = lockClient;
-  }
+	public DemoController(LockClient lockClient) {
+		this.lockClient = lockClient;
+	}
 
-  @GetMapping("/demo/ping")
-  public Map<String, Object> ping() {
-    return Map.of("ok", true);
-  }
+	@GetMapping("/demo/ping")
+	public Map<String, Object> ping() {
+		return Map.of("ok", true);
+	}
 
-  @GetMapping("/demo/lock")
-  public Map<String, Object> lock(
-      @RequestParam String name, @RequestParam(defaultValue = "5") int ttlSeconds) {
-    Optional<LockHandle> handle = lockClient.tryLock(name, Duration.ofSeconds(ttlSeconds));
-    if (handle.isEmpty()) {
-      return Map.of("name", name, "acquired", false);
-    }
-    LockHandle lockHandle = handle.get();
-    try (lockHandle) {
-      return Map.of("name", name, "acquired", true);
-    }
-  }
+	@GetMapping("/demo/lock")
+	public Map<String, Object> lock(@RequestParam String name, @RequestParam(defaultValue = "5") int ttlSeconds) {
+		Optional<LockHandle> handle = lockClient.tryLock(name, Duration.ofSeconds(ttlSeconds));
+		if (handle.isEmpty()) {
+			return Map.of("name", name, "acquired", false);
+		}
+		LockHandle lockHandle = handle.get();
+		try (lockHandle) {
+			return Map.of("name", name, "acquired", true);
+		}
+	}
 }

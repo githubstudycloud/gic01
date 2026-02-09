@@ -3,6 +3,13 @@
 Enterprise-grade platform foundation built around strict module boundaries, strong verification gates,
 and "starter-first" ergonomics for Spring Boot 4.x.
 
+## New here?
+
+- Start with `docs/getting-started.md`
+- Architecture blueprint: `docs/platform-blueprint.md`
+- Contribution rules: `CONTRIBUTING.md` (module boundaries + dependency policy)
+- Multi-agent guide: `AGENTS.md` (humans + AIs)
+
 ## Quick start (Maven)
 
 Build everything (unit tests only by default):
@@ -31,4 +38,3 @@ and modules. See `platform-example-gradle-consumer/`.
 ## Namespace changes (groupId / base package)
 
 Use `scripts/rename-namespace.ps1` to rename `com.test.platform` to your real coordinates later.
-

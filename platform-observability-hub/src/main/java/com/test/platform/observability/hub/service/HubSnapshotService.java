@@ -10,25 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class HubSnapshotService {
-  private final HubProperties properties;
-  private final ServiceSnapshotFetcher fetcher;
+	private final HubProperties properties;
+	private final ServiceSnapshotFetcher fetcher;
 
-  public HubSnapshotService(HubProperties properties, ServiceSnapshotFetcher fetcher) {
-    this.properties = properties;
-    this.fetcher = fetcher;
-  }
+	public HubSnapshotService(HubProperties properties, ServiceSnapshotFetcher fetcher) {
+		this.properties = properties;
+		this.fetcher = fetcher;
+	}
 
-  public List<ObservedService> services() {
-    return properties.getServices().stream()
-        .map(
-            s ->
-                new ObservedService(
-                    s.getName(), URI.create(s.getBaseUrl()), s.getTags()))
-        .toList();
-  }
+	public List<ObservedService> services() {
+		return properties.getServices().stream()
+				.map(s -> new ObservedService(s.getName(), URI.create(s.getBaseUrl()), s.getTags())).toList();
+	}
 
-  public List<ServiceSnapshot> snapshot() {
-    return fetcher.fetch(services(), properties.getRequestTimeout(), properties.getParallelism());
-  }
+	public List<ServiceSnapshot> snapshot() {
+		return fetcher.fetch(services(), properties.getRequestTimeout(), properties.getParallelism());
+	}
 }
-
