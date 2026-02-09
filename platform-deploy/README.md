@@ -34,6 +34,9 @@ K8s (Helm) deploy:
 ./platform-deploy/deploy.ps1 -Mode k8s -ServiceName platform-sample -Image your-registry/platform-sample:0.1.0 -Namespace dev
 ```
 
+Notes:
+- By default, the Helm release name is also used as the Kubernetes `Deployment`/`Service` name (so `deployment/<release>` matches).
+
 ## Bash
 
 ```bash
