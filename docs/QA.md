@@ -143,3 +143,18 @@ A（本次已落地）:
     - `GET /registry/snapshot`：并行抓取快照（HTTP 状态 + digest）
     - `GET /registry/spec/{name}`：代理返回原始 spec
 - 使用说明文档：`docs/api-contracts-and-registry.md`
+
+## 2026-02-09 - Vue 框架：前端工程骨架 + OpenAPI 类型化调用
+
+Q（落地动作）:
+- 引入 Vue 前端框架，并与 OpenAPI 合同打通，支持本地轻量调试与统一请求关联。
+
+A（本次已落地）:
+- 新增前端工程：`platform-frontend-vue/`（Vue3 + Vite + TypeScript）
+- OpenAPI 类型化调用：
+  - `npm run gen:api` 从 `platform-sample-app` 的 `/openapi.yaml`（仓库内静态文件）生成 `src/api/openapi.ts`
+  - 使用 `openapi-fetch` 进行类型化请求
+- 通信/关联约定：
+  - 前端请求自动附带 `X-Request-Id`（便于与后端日志/链路关联）
+  - Vite dev server 默认 proxy 到 `http://localhost:8080`（减少 CORS/环境配置成本）
+- 文档补充：`docs/getting-started.md` 已加入 Vue 启动步骤
