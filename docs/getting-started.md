@@ -57,7 +57,7 @@ Hub 会根据配置拉取各服务的 actuator 输出并汇总（health/info）�
 - `platform-autoconfigure-*`：Spring Boot 自动装配
 - `platform-starter-*`：starter-first 依赖聚合与默认约定
 - `platform-deploy`：一键多方式部署骨架
-- `platform-loadtest`：并发/集群验证脚手架（占位，后续补全）
+- `platform-loadtest`：并发/集群验证脚手架（k6 + kind 实验场）
 
 ## 5. 预发布命名空间替换
 
@@ -106,3 +106,10 @@ python -m venv .venv
 pip install -r requirements.txt
 pytest
 ```
+
+## 10. 并发/集群验证（可选）
+
+- k6（轻量并发/压测）：`platform-loadtest/run-k6.ps1`、`platform-loadtest/run-k6.sh`
+- kind（本地 K8s 实验场）：`platform-loadtest/kind/lab.ps1`、`platform-loadtest/kind/lab.sh`
+
+详见：`platform-loadtest/README.md`

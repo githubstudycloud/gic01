@@ -173,3 +173,20 @@ A（本次已落地）:
     - `test_concurrency.py`：并发 ping 用例（标记为 `integration`）
   - 通过 `PLATFORM_BASE_URL` 环境变量切换被测服务地址
 - 文档补充：`docs/getting-started.md` 已加入 Python 测试启动步骤
+
+## 2026-02-09 - 并发/集群验证：platform-loadtest（k6 + kind）
+
+Q（落地动作）:
+- 补全 `platform-loadtest`，用于最小化的并发/集群验证（可复现、可量化），并保持默认 PR 验证不膨胀。
+
+A（本次已落地）:
+- k6（Docker 运行，无需本地安装 k6）：
+  - `platform-loadtest/k6/ping-smoke.js`：/demo/ping smoke
+  - `platform-loadtest/k6/lock-contention.js`：锁争用场景（可配置 holdMillis）
+  - `platform-loadtest/run-k6.ps1`、`platform-loadtest/run-k6.sh`：一键运行入口
+- kind 本地集群实验场：
+  - `platform-loadtest/kind/kind-config.yaml`：3 节点集群
+  - `platform-loadtest/kind/lab.ps1`、`platform-loadtest/kind/lab.sh`：构建 sample app 镜像、load 到 kind、用共享 Helm chart 部署 N 副本
+- 为压测场景补充后端接口能力：
+  - `platform-sample-app` 的 `/demo/lock` 支持可选 `holdMillis`（并做上限保护），并同步更新 OpenAPI 合同与前端生成类型
+- 文档补充：`docs/getting-started.md` 增加并发/集群验证入口说明
