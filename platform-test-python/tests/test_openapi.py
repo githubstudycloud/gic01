@@ -11,4 +11,5 @@ def test_openapi_yaml_is_present(client: httpx.Client):
     assert doc["openapi"].startswith("3.")
     assert "/demo/ping" in doc["paths"]
     assert "/demo/lock" in doc["paths"]
-
+    assert "/flows" in doc["paths"]
+    assert "/crud/todos" in doc["paths"]

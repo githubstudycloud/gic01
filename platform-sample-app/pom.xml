@@ -29,6 +29,37 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>platform-starter-lock</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>platform-starter-flow</artifactId>
+    </dependency>
+
+    <!-- Sample business modules (loaded as "plugins" via auto-configuration). -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>platform-sample-biz-metrics-collector</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>platform-sample-biz-metrics-measure</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>platform-sample-biz-metrics-flow</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>platform-sample-biz-workflow</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>platform-sample-biz-crud</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -49,4 +80,3 @@
     </plugins>
   </build>
 </project>
-

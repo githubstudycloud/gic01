@@ -50,6 +50,11 @@
     <module>platform-observability-hub</module>
     <module>platform-api-registry-core</module>
     <module>platform-api-registry</module>
+    <module>platform-sample-biz-metrics-collector</module>
+    <module>platform-sample-biz-metrics-measure</module>
+    <module>platform-sample-biz-metrics-flow</module>
+    <module>platform-sample-biz-workflow</module>
+    <module>platform-sample-biz-crud</module>
     <module>platform-sample-app</module>
   </modules>
 

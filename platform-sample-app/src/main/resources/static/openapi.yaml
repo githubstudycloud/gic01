@@ -3,6 +3,187 @@ info:
   title: platform-sample-app
   version: 0.1.0-SNAPSHOT
 paths:
+  /flows:
+    get:
+      summary: List flows
+      operationId: listFlows
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FlowDto"
+  /flows/{flowId}:
+    get:
+      summary: Get flow definition
+      operationId: getFlow
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FlowDto"
+  /flows/{flowId}/runs:
+    get:
+      summary: List flow runs
+      operationId: listFlowRuns
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RunDto"
+    post:
+      summary: Start a flow run
+      operationId: startFlowRun
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartRunRequest"
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartRunResponse"
+  /flows/{flowId}/runs/{runId}:
+    get:
+      summary: Get a flow run
+      operationId: getFlowRun
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunDto"
+  /flows/{flowId}/runs/{runId}/artifacts:
+    get:
+      summary: Get artifacts snapshot for a run
+      operationId: getFlowRunArtifacts
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArtifactsSnapshot"
+  /flows/{flowId}/runs/{runId}/retry:
+    post:
+      summary: Retry a run (starts a new run with the same targets/inputs)
+      operationId: retryFlowRun
+      parameters:
+        - name: flowId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartRunResponse"
   /demo/ping:
     get:
       summary: Ping
@@ -62,8 +243,202 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LockResult"
+  /crud/todos:
+    get:
+      summary: List todos
+      operationId: listTodos
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TodoItem"
+    post:
+      summary: Create todo
+      operationId: createTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTodoRequest"
+      responses:
+        "201":
+          description: Created
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoItem"
+  /crud/todos/{id}:
+    get:
+      summary: Get todo
+      operationId: getTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoItem"
+    put:
+      summary: Update todo
+      operationId: updateTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTodoRequest"
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoItem"
+    delete:
+      summary: Delete todo
+      operationId: deleteTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Request correlation id
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteTodoResponse"
 components:
   schemas:
+    FlowDto:
+      type: object
+      required: [id, stepIds, defaultTargets]
+      properties:
+        id:
+          type: string
+        stepIds:
+          type: array
+          items:
+            type: string
+        defaultTargets:
+          type: array
+          items:
+            type: string
+    StartRunRequest:
+      type: object
+      properties:
+        inputs:
+          type: object
+          additionalProperties: true
+        targets:
+          type: array
+          items:
+            type: string
+    StartRunResponse:
+      type: object
+      required: [runId]
+      properties:
+        runId:
+          type: string
+    StepRunDto:
+      type: object
+      required: [stepId, status]
+      properties:
+        stepId:
+          type: string
+        status:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+    RunDto:
+      type: object
+      required: [runId, flowId, status, createdAt, targets, artifactKeys, steps]
+      properties:
+        runId:
+          type: string
+        flowId:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        targets:
+          type: array
+          items:
+            type: string
+        artifactKeys:
+          type: array
+          items:
+            type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/StepRunDto"
+    ArtifactsSnapshot:
+      type: object
+      additionalProperties: true
     LockResult:
       type: object
       required: [name, acquired]
@@ -71,4 +446,41 @@ components:
         name:
           type: string
         acquired:
+          type: boolean
+    TodoItem:
+      type: object
+      required: [id, title, done, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        done:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateTodoRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+    UpdateTodoRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        done:
+          type: boolean
+    DeleteTodoResponse:
+      type: object
+      required: [id, deleted]
+      properties:
+        id:
+          type: string
+        deleted:
           type: boolean

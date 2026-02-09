@@ -77,6 +77,15 @@ public class PlatformFlowController {
 		return toRunDto(run, artifactStore.snapshot(runId).keySet());
 	}
 
+	@GetMapping("/{flowId}/runs/{runId}/artifacts")
+	public Map<String, Object> getRunArtifacts(@PathVariable String flowId, @PathVariable String runId) {
+		PlatformFlowRun run = runRepository.findById(runId).orElseThrow();
+		if (!run.getFlowId().equals(flowId)) {
+			throw new IllegalArgumentException("Run does not belong to flow " + flowId + ": " + runId);
+		}
+		return artifactStore.snapshot(runId);
+	}
+
 	@PostMapping("/{flowId}/runs/{runId}/retry")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	public StartRunResponse retry(@PathVariable String flowId, @PathVariable String runId) {
