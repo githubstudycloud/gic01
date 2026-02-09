@@ -26,7 +26,14 @@
     <module>platform-parent</module>
     <module>platform-bom</module>
     <module>platform-kernel</module>
+    <module>platform-spi-lock</module>
+    <module>platform-adapter-lock-local</module>
+    <module>platform-adapter-lock-redis</module>
+    <module>platform-autoconfigure-lock</module>
+    <module>platform-autoconfigure-lock-redis</module>
     <module>platform-autoconfigure-observability</module>
     <module>platform-starter-observability</module>
+    <module>platform-starter-lock</module>
+    <module>platform-starter-lock-redis</module>
   </modules>
 </project>

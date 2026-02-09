@@ -55,3 +55,17 @@ A（结果摘要）:
 - Maven 多模块：`platform-root`（聚合）、`platform-parent`（统一插件/门禁/Java17+ & 可选 java21）、`platform-bom`（导入 Spring Boot 4.x BOM + 管理平台模块版本）、`platform-kernel`（无 Spring 内核）、`platform-autoconfigure-observability` + `platform-starter-observability`（最小自监听能力示例）。
 - 最小验证：默认 `mvn test` 仅跑单测；`-Pit` 开启 IT（当前作为骨架已预留 failsafe 配置）。
 - Gradle 消费：`platform-example-gradle-consumer/` 使用 Gradle Wrapper + 导入 `platform-bom` 进行依赖对齐，并可直接跑测试验证可消费性。
+
+## 2026-02-09 - 补全 SPI/Adapter 示例：分布式锁（local + redis）
+
+Q（落地动作）:
+- 按顺序补全 `platform-spi-*` 与 `platform-adapter-*` 示例，要求可替换实现、可独立验证、与 starter 解耦。
+
+A（结果摘要）:
+- 新增 SPI：`platform-spi-lock`（纯 Java，定义 `LockClient`/`LockRequest`/`LockHandle`，并用 ArchUnit 禁止依赖 Spring/Jakarta）。
+- 新增 adapter：
+  - `platform-adapter-lock-local`：本地 JVM 互斥锁实现（默认非可重入语义）。
+  - `platform-adapter-lock-redis`：Redis 实现（SET NX PX + Lua compare-and-del 解锁），并提供可选 IT（Docker 不可用则自动跳过）。
+- 新增 autoconfigure + starter：
+  - `platform-autoconfigure-lock` + `platform-starter-lock`：默认 `platform.lock.provider=local`。
+  - `platform-autoconfigure-lock-redis` + `platform-starter-lock-redis`：当 `platform.lock.provider=redis` 且存在 `StringRedisTemplate` 时装配 Redis 实现。
