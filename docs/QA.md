@@ -158,3 +158,18 @@ A（本次已落地）:
   - 前端请求自动附带 `X-Request-Id`（便于与后端日志/链路关联）
   - Vite dev server 默认 proxy 到 `http://localhost:8080`（减少 CORS/环境配置成本）
 - 文档补充：`docs/getting-started.md` 已加入 Vue 启动步骤
+
+## 2026-02-09 - Python 测试框架：pytest/httpx 黑盒 + 合同校验 + 并发用例
+
+Q（落地动作）:
+- 引入 Python 测试框架，用于黑盒验证、合同（OpenAPI）校验、以及轻量并发验证。
+
+A（本次已落地）:
+- 新增：`platform-test-python/`
+  - 依赖：`pytest` + `httpx` + `pytest-asyncio` + `pyyaml` + `ruff`
+  - 用例：
+    - `test_smoke.py`：/demo/ping、/demo/lock 黑盒 smoke（含 `X-Request-Id` 断言）
+    - `test_openapi.py`：校验 `/openapi.yaml` 存在且包含关键 paths
+    - `test_concurrency.py`：并发 ping 用例（标记为 `integration`）
+  - 通过 `PLATFORM_BASE_URL` 环境变量切换被测服务地址
+- 文档补充：`docs/getting-started.md` 已加入 Python 测试启动步骤
