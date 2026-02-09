@@ -50,3 +50,25 @@ K8s (Helm) deploy:
   - Ingress/Gateway, service mesh, pod security policies, PDB, network policies
   - secret management, observability exporters, rollout strategies
 
+## Local observability stack (optional)
+
+Bring up a local stack for metrics + traces (Prometheus + Grafana + Tempo + OTLP collector):
+
+```powershell
+docker compose -f ./platform-deploy/compose/docker-compose.observability.yml up -d
+```
+
+Run apps on the host (ports: sample 8080, hub 8081) and enable OTLP export:
+
+```powershell
+$env:PLATFORM_TRACING_OTEL_EXPORT_ENABLED="true"
+$env:OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4317"
+
+mvn -q -pl platform-sample-app spring-boot:run
+mvn -q -pl platform-observability-hub spring-boot:run
+```
+
+Open:
+- Grafana: `http://localhost:3000` (admin / `${GRAFANA_ADMIN_PASSWORD:-admin}`)
+- Prometheus: `http://localhost:9090`
+- Tempo: `http://localhost:3200`

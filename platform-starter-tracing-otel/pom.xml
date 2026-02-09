@@ -11,36 +11,35 @@
     <relativePath>../platform-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>platform-starter-observability</artifactId>
-  <name>platform-starter-observability</name>
-  <description>Starter for platform observability defaults</description>
+  <artifactId>platform-starter-tracing-otel</artifactId>
+  <name>platform-starter-tracing-otel</name>
+  <description>Starter for OpenTelemetry tracing (Micrometer bridge + OTLP exporter)</description>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>platform-autoconfigure-observability</artifactId>
+      <artifactId>platform-autoconfigure-tracing-otel</artifactId>
     </dependency>
 
-    <!-- Actuator is the standard backbone for self-observability (health/info/metrics). -->
+    <!-- Actuator contains Micrometer observation/tracing auto-configuration. -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- Default logging/tracing for enterprise-grade observability (override-friendly). -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>platform-starter-logging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>platform-starter-tracing-otel</artifactId>
-    </dependency>
-
-    <!-- Prometheus scrape endpoint: /actuator/prometheus -->
     <dependency>
       <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-registry-prometheus</artifactId>
+      <artifactId>micrometer-tracing-bridge-otel</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

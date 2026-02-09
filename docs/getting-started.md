@@ -45,6 +45,7 @@ mvn -q -pl platform-observability-hub spring-boot:run
 ```
 
 Hub 会根据配置拉取各服务的 actuator 输出并汇总（health/info）。
+默认端口：`8081`。
 
 ## 4. 看懂仓库结构（只记住这几条）
 
@@ -70,3 +71,7 @@ Hub 会根据配置拉取各服务的 actuator 输出并汇总（health/info）�
 - `AGENTS.md`：本仓库 AI 协作规则（含必须追加 `docs/QA.md` 存档）
 - `CONTRIBUTING.md`：贡献指南（边界/验证/依赖政策）
 
+## 7. 本地可观测（可选）
+
+- 默认日志为结构化 JSON（便于采集/检索）；如需本地更“轻”，可设置 `platform.logging.enabled=false`。
+- 可用 `platform-deploy/compose/docker-compose.observability.yml` 一键启动本地 metrics + tracing 栈。

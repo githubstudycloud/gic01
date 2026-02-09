@@ -1,20 +1,27 @@
+spring:
+  application:
+    name: platform-observability-hub
+
 server:
-  port: 8080
+  port: 8081
 
 platform:
   hub:
     request-timeout: 2s
     parallelism: 8
     services: []
+  tracing:
+    otel:
+      export:
+        enabled: false
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       probes:
         enabled: true
       show-details: never
-

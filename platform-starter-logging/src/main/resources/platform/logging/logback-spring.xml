@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+  <!-- Spring Boot extensions require a *-spring.xml name. -->
+
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <!-- Prefer spring.application.name, fallback to "app". -->
+  <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="app"/>
+
+  <!-- Use LOG_LEVEL_ROOT for quick local overrides. -->
+  <property name="LOG_LEVEL_ROOT" value="${LOG_LEVEL_ROOT:-INFO}"/>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <!--
+        Keep fields minimal and stable.
+        MDC carries correlation ids (requestId/traceId/spanId/etc).
+      -->
+      <customFields>{"service":"${APP_NAME}"}</customFields>
+    </encoder>
+  </appender>
+
+  <root level="${LOG_LEVEL_ROOT}">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+</configuration>
+

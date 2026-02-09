@@ -1,0 +1,3 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.test.platform.logging.autoconfigure.PlatformLoggingEnvironmentPostProcessor
+
