@@ -1,0 +1,25 @@
+{
+  "name": "platform-frontend-vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "gen:api": "openapi-typescript ../platform-sample-app/src/main/resources/static/openapi.yaml -o src/api/openapi.ts",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.15.0",
+    "vue": "^3.5.25"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "@vue/tsconfig": "^0.8.1",
+    "openapi-typescript": "^7.9.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vue-tsc": "^3.1.5"
+  }
+}

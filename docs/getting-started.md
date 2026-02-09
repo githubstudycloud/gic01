@@ -75,3 +75,22 @@ Hub 会根据配置拉取各服务的 actuator 输出并汇总（health/info）�
 
 - 默认日志为结构化 JSON（便于采集/检索）；如需本地更“轻”，可设置 `platform.logging.enabled=false`。
 - 可用 `platform-deploy/compose/docker-compose.observability.yml` 一键启动本地 metrics + tracing 栈。
+
+## 8. Vue 前端（可选）
+
+后端先跑样例服务：
+
+```bash
+mvn -q -pl platform-sample-app spring-boot:run
+```
+
+再启动前端（默认走 Vite proxy，无需配置 CORS）：
+
+```bash
+cd platform-frontend-vue
+npm install
+npm run gen:api
+npm run dev
+```
+
+打开：`http://localhost:5173`
