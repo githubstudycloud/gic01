@@ -284,3 +284,18 @@ A（本次已落地）:
 - 新增 WSL 一键 smoke：`platform-deploy/wsl/smoke.sh`
   - 构建 `platform-sample-app` -> 构建 Docker 镜像 -> `platform-deploy/deploy.sh` readiness gate -> 运行 `platform-test-python` 黑盒用例
 - 文档补充：`platform-deploy/README.md` 增加 WSL 使用说明
+
+## 2026-02-10 - 部署矩阵扩展：远程 Docker Context + Docker Swarm 一键部署入口
+
+Q（继续补全）:
+- 在已跑通 WSL 基线后，继续补全部署矩阵：支持远程 Docker、Docker Swarm，并保持脚本入口统一可维护
+
+A（本次已落地）:
+- `platform-deploy/deploy.sh`：
+  - 新增 `DOCKER_CONTEXT` 支持（同一脚本可切换本地/远程 Docker Engine）
+  - 新增 `swarm` 模式：`docker stack deploy` + readiness gate（可配 `STACK_FILE`、`STACK_NAME`）
+- `platform-deploy/deploy.ps1`：
+  - 新增 `-DockerContext` 参数
+  - 新增 `swarm` 模式（stack deploy + readiness gate）
+- 新增 Swarm stack 模板：`platform-deploy/swarm/stack.yml`（镜像/端口/副本可通过环境变量注入）
+- 文档补充：`platform-deploy/README.md` 增加 Remote Docker / Swarm 使用示例
