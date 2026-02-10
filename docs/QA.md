@@ -269,3 +269,18 @@ A（本次已落地）:
   - `platform-frontend-vue` 重新生成 OpenAPI types，并新增 Flows/Todos 调试看板（启动/重试/查看 artifacts）
 - Python 黑盒验证：
   - `platform-test-python` 增加 `test_flow.py`、`test_crud.py`，用于接口监控与快速回归
+
+## 2026-02-10 - 部署与验证：WSL 优先的 smoke 部署脚本 + 跨系统行尾治理
+
+Q（落地动作）:
+- 部署拆分、脚本维护、统一构建与验证矩阵：本地 WSL、本地 Docker、远程 Docker、k3s/k8s、Docker Swarm
+- 优先把 “WSL 部署 + 最小化验证” 跑通（作为后续扩展到其它目标的基线）
+
+A（本次已落地）:
+- 跨系统行尾治理（避免 Windows/WSL 格式漂移）：
+  - 新增 `.gitattributes`：强制 `*.java`、`*.sh` 使用 LF
+  - Spotless 改为使用 `GIT_ATTRIBUTES` 行尾策略：根 `pom.xml` + `platform-parent/pom.xml`
+- Docker 运行修复：在 `platform-parent/pom.xml` 中为 `spring-boot-maven-plugin` 启用 `repackage` 默认执行，确保 sample app 产物为可执行 boot jar
+- 新增 WSL 一键 smoke：`platform-deploy/wsl/smoke.sh`
+  - 构建 `platform-sample-app` -> 构建 Docker 镜像 -> `platform-deploy/deploy.sh` readiness gate -> 运行 `platform-test-python` 黑盒用例
+- 文档补充：`platform-deploy/README.md` 增加 WSL 使用说明
