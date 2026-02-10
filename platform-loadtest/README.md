@@ -41,3 +41,11 @@ This is a starting point for cluster verification:
 See:
 - `platform-loadtest/kind/lab.ps1`
 - `platform-loadtest/kind/lab.sh`
+
+## Local K8s lab (k3d / k3s) - optional
+
+Same idea as the kind lab, but using k3s (via k3d):
+
+See:
+- `platform-loadtest/k3d/lab.ps1`
+- `platform-loadtest/k3d/lab.sh`
