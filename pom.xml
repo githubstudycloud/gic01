@@ -66,6 +66,7 @@
         <artifactId>spotless-maven-plugin</artifactId>
         <version>${spotless.maven.plugin.version}</version>
         <configuration>
+          <lineEndings>GIT_ATTRIBUTES</lineEndings>
           <java>
             <eclipse/>
             <removeUnusedImports/>

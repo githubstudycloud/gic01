@@ -1,0 +1,5 @@
+# Keep line endings consistent across Windows/WSL/Linux checkouts.
+# This prevents format drift and makes bash scripts runnable in WSL.
+*.java text eol=lf
+*.sh text eol=lf
+

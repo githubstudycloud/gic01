@@ -44,6 +44,17 @@ Notes:
 ./platform-deploy/deploy.sh docker platform-sample platform-sample:local
 ```
 
+## WSL (local)
+
+If you're on Windows and want to run the deploy + smoke tests from WSL (Ubuntu), use the WSL wrapper script:
+
+```bash
+./platform-deploy/wsl/smoke.sh
+```
+
+It builds the sample app JAR, builds a Docker image, deploys it via Docker, gates on readiness,
+and runs the Python black-box test suite against the deployed service.
+
 ## Notes
 
 - K8s templates assume Spring Boot actuator probes:
