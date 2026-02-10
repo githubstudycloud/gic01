@@ -310,3 +310,21 @@ A（本次已落地）:
   - 创建 k3d 集群（如不存在） -> 构建 sample jar -> 构建镜像 -> `k3d image import` -> Helm 部署 -> rollout gate
   - Bash 版本支持 `RUN_SMOKE=1` 自动 port-forward + readiness + k6 + Python 黑盒验证
 - 文档补充：`platform-loadtest/README.md` 增加 k3d lab 入口说明
+
+## 2026-02-10 - 按顺序补全：release-verify 多部署模式 + k3d(ps1) 一键 smoke + digest 发布脚手架
+
+Q（继续补全）:
+- 按顺序继续完善“一键式多方式部署 + 最小化发布验证”：复用统一入口，支持多部署模式与集群验证；同时补齐发布到集群时的 digest 固化
+
+A（本次已落地）:
+- `scripts/release-verify.sh` / `scripts/release-verify.ps1`：
+  - 支持 `DEPLOY_MODE=docker|compose|swarm|k8s`（并复用 `platform-deploy/deploy.*` 作为部署+门禁入口）
+  - 支持远程 Docker Context 参数透传（`DOCKER_CONTEXT` / `-DockerContext`）与自定义 `BASE_URL`/`HEALTH_URL`
+- `platform-loadtest/k3d/lab.ps1`：
+  - 增加 `-RunSmoke`（自动 port-forward + readiness gate，可选跑 k6/Python）
+- K8s digest 固化（推荐 prod）：
+  - Helm chart 支持 `image.digest`：`platform-deploy/helm/platform-service/*`
+  - `platform-deploy/deploy.sh` / `platform-deploy/deploy.ps1` 支持 `your-image@sha256:...` 部署
+- 新增发布辅助脚本（构建 jar -> 构建镜像 -> 可选 push -> 输出 digest 与部署命令）：
+  - `scripts/publish-image.sh`
+  - `scripts/publish-image.ps1`
