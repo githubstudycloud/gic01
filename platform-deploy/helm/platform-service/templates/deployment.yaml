@@ -19,7 +19,11 @@ spec:
     spec:
       containers:
         - name: app
+          {{- if .Values.image.digest }}
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -43,4 +47,3 @@ spec:
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-

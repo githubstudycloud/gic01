@@ -59,13 +59,22 @@ case "$mode" in
     chart="${CHART_PATH:-${deploy_dir}/helm/platform-service}"
     repo="$image"
     tag="latest"
-    if [[ "$image" =~ ^(.+):([^/]+)$ ]]; then
+    digest=""
+    if [[ "$image" == *@* ]]; then
+      repo="${image%@*}"
+      digest="${image#*@}"
+    elif [[ "$image" =~ ^(.+):([^/]+)$ ]]; then
       repo="${BASH_REMATCH[1]}"
       tag="${BASH_REMATCH[2]}"
+    fi
+    digest_args=()
+    if [ -n "$digest" ]; then
+      digest_args=(--set "image.digest=${digest}")
     fi
     helm upgrade --install "$release" "$chart" -n "$ns" --create-namespace \
       --set "image.repository=${repo}" \
       --set "image.tag=${tag}" \
+      "${digest_args[@]}" \
       --set "service.port=${container_port}"
     kubectl rollout status "deployment/${release}" -n "$ns" --timeout "${health_timeout}s"
     ;;

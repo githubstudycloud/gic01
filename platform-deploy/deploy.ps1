@@ -142,17 +142,28 @@ switch ($Mode) {
 
     $repo = $Image
     $tag = "latest"
-    if ($Image -match "^(.+):([^/]+)$") {
+    $digest = ""
+    if ($Image -match "^(?<repo>.+)@(?<digest>.+)$") {
+      $repo = $Matches["repo"]
+      $digest = $Matches["digest"]
+    } elseif ($Image -match "^(.+):([^/]+)$") {
       $repo = $Matches[1]
       $tag = $Matches[2]
     }
 
     Write-Host "Deploying via Helm: $Release ($repo:$tag) ns=$Namespace"
-    helm upgrade --install $Release $ChartPath `
-      -n $Namespace --create-namespace `
-      --set "image.repository=$repo" `
-      --set "image.tag=$tag" `
-      --set "service.port=$ContainerPort" | Out-Host
+    $helmArgs = @(
+      "upgrade", "--install", $Release, $ChartPath,
+      "-n", $Namespace, "--create-namespace",
+      "--set", "image.repository=$repo",
+      "--set", "image.tag=$tag",
+      "--set", "service.port=$ContainerPort"
+    )
+    if (-not [string]::IsNullOrWhiteSpace($digest)) {
+      $helmArgs += @("--set", "image.digest=$digest")
+    }
+
+    & helm @helmArgs | Out-Host
     RequireLastExitCode "helm upgrade"
 
     kubectl rollout status "deployment/$Release" -n $Namespace --timeout "$HealthTimeoutSeconds`s" | Out-Host

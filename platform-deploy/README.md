@@ -48,6 +48,12 @@ K8s (Helm) deploy:
 ./platform-deploy/deploy.ps1 -Mode k8s -ServiceName platform-sample -Image your-registry/platform-sample:0.1.0 -Namespace dev
 ```
 
+Immutable digest deploy (recommended for prod):
+
+```powershell
+./platform-deploy/deploy.ps1 -Mode k8s -ServiceName platform-sample -Image your-registry/platform-sample@sha256:deadbeef... -Namespace dev
+```
+
 Notes:
 - By default, the Helm release name is also used as the Kubernetes `Deployment`/`Service` name (so `deployment/<release>` matches).
 
@@ -70,6 +76,12 @@ Docker Swarm:
 
 ```bash
 ./platform-deploy/deploy.sh swarm platform-sample your-registry/platform-sample:0.1.0
+```
+
+K8s immutable digest deploy (recommended for prod):
+
+```bash
+./platform-deploy/deploy.sh k8s platform-sample your-registry/platform-sample@sha256:deadbeef...
 ```
 
 ## WSL (local)

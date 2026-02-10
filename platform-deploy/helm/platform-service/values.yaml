@@ -3,6 +3,9 @@ replicaCount: 2
 image:
   repository: "platform/service"
   tag: "latest"
+  # Optional: if set, use immutable digest reference (repository@digest) instead of tag.
+  # Example: sha256:deadbeef...
+  digest: ""
   pullPolicy: IfNotPresent
 
 service:
@@ -22,4 +25,3 @@ livenessProbe:
   path: /actuator/health/liveness
   initialDelaySeconds: 10
   periodSeconds: 10
-
