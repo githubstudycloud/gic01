@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [Parameter(Mandatory = $true)]
-  [ValidateSet("docker", "compose", "k8s", "baremetal")]
+  [ValidateSet("docker", "compose", "swarm", "k8s", "baremetal")]
   [string]$Mode,
 
   [Parameter(Mandatory = $true)]
@@ -22,7 +22,9 @@ param(
   [string]$Release,
 
   [string]$ChartPath = (Join-Path $PSScriptRoot "helm/platform-service"),
-  [string]$ComposePath = (Join-Path $PSScriptRoot "compose/docker-compose.yml")
+  [string]$ComposePath = (Join-Path $PSScriptRoot "compose/docker-compose.yml"),
+  [string]$StackPath = (Join-Path $PSScriptRoot "swarm/stack.yml"),
+  [string]$DockerContext = $env:DOCKER_CONTEXT
 )
 
 Set-StrictMode -Version Latest
@@ -58,6 +60,11 @@ if ([string]::IsNullOrWhiteSpace($Release)) {
   $Release = $ServiceName
 }
 
+$docker = @("docker")
+if (-not [string]::IsNullOrWhiteSpace($DockerContext)) {
+  $docker += @("--context", $DockerContext)
+}
+
 if ([string]::IsNullOrWhiteSpace($Image) -and -not [string]::IsNullOrWhiteSpace($JarPath)) {
   RequireCommand docker
   $repoRoot = GetRepoRoot
@@ -68,7 +75,7 @@ if ([string]::IsNullOrWhiteSpace($Image) -and -not [string]::IsNullOrWhiteSpace(
   Write-Host "Building image: $imageTag"
   Write-Host "  Dockerfile: $dockerfile"
   Write-Host "  JAR:        $jarRel"
-  docker build `
+  & $docker build `
     -f $dockerfile `
     --build-arg "JAVA_VERSION=$JavaVersion" `
     --build-arg "JAR_FILE=$jarRel" `
@@ -87,8 +94,8 @@ switch ($Mode) {
     }
 
     Write-Host "Deploying via Docker: $ServiceName ($Image)"
-    docker rm -f $ServiceName 2>$null | Out-Null
-    docker run -d --name $ServiceName -p "$HostPort`:$ContainerPort" $Image | Out-Null
+    & $docker rm -f $ServiceName 2>$null | Out-Null
+    & $docker run -d --name $ServiceName -p "$HostPort`:$ContainerPort" $Image | Out-Null
     RequireLastExitCode "docker run"
 
     & (Join-Path $PSScriptRoot "verify-http.ps1") -Url $HealthUrl -TimeoutSeconds $HealthTimeoutSeconds
@@ -104,8 +111,24 @@ switch ($Mode) {
     $env:PLATFORM_PORT = "$HostPort"
 
     Write-Host "Deploying via Docker Compose: $ServiceName ($Image)"
-    docker compose -f $ComposePath --project-name $ServiceName up -d | Out-Host
+    & $docker compose -f $ComposePath --project-name $ServiceName up -d | Out-Host
     RequireLastExitCode "docker compose up"
+
+    & (Join-Path $PSScriptRoot "verify-http.ps1") -Url $HealthUrl -TimeoutSeconds $HealthTimeoutSeconds
+  }
+
+  "swarm" {
+    RequireCommand docker
+    if ([string]::IsNullOrWhiteSpace($Image)) {
+      throw "For -Mode swarm, provide -Image (a registry image is recommended)."
+    }
+
+    $env:PLATFORM_IMAGE = $Image
+    $env:PLATFORM_PORT = "$HostPort"
+
+    Write-Host "Deploying via Docker Swarm stack: $ServiceName ($Image)"
+    & $docker stack deploy -c $StackPath $ServiceName | Out-Host
+    RequireLastExitCode "docker stack deploy"
 
     & (Join-Path $PSScriptRoot "verify-http.ps1") -Url $HealthUrl -TimeoutSeconds $HealthTimeoutSeconds
   }

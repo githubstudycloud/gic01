@@ -5,6 +5,7 @@ Goal: one artifact, many targets, with minimal "release verification" hooks.
 This folder provides deployment templates and one-command wrappers:
 - `docker` (single container)
 - `compose` (local multi-dependency topology)
+- `swarm` (Docker Swarm stack)
 - `k8s` (Helm chart)
 - `baremetal` (systemd template)
 
@@ -22,10 +23,23 @@ Deploy an existing image via Docker and verify readiness:
 ./platform-deploy/deploy.ps1 -Mode docker -ServiceName platform-sample -Image platform-sample:local
 ```
 
+Remote Docker via Docker context:
+
+```powershell
+./platform-deploy/deploy.ps1 -Mode docker -ServiceName platform-sample -Image your-registry/platform-sample:0.1.0 `
+  -DockerContext platform-remote -HealthUrl http://your-host:8080/actuator/health/readiness
+```
+
 Build an image from a jar (Dockerfile) and deploy:
 
 ```powershell
 ./platform-deploy/deploy.ps1 -Mode docker -ServiceName platform-sample -JarPath platform-sample-app/target/platform-sample-app-0.1.0-SNAPSHOT.jar
+```
+
+Docker Swarm:
+
+```powershell
+./platform-deploy/deploy.ps1 -Mode swarm -ServiceName platform-sample -Image your-registry/platform-sample:0.1.0
 ```
 
 K8s (Helm) deploy:
@@ -42,6 +56,20 @@ Notes:
 ```bash
 ./platform-deploy/verify-http.sh http://localhost:8080/actuator/health/readiness
 ./platform-deploy/deploy.sh docker platform-sample platform-sample:local
+```
+
+Remote Docker via Docker context (health URL must be reachable from where you run the script):
+
+```bash
+DOCKER_CONTEXT=platform-remote \
+  HEALTH_URL=http://your-host:8080/actuator/health/readiness \
+  ./platform-deploy/deploy.sh docker platform-sample your-registry/platform-sample:0.1.0
+```
+
+Docker Swarm:
+
+```bash
+./platform-deploy/deploy.sh swarm platform-sample your-registry/platform-sample:0.1.0
 ```
 
 ## WSL (local)
