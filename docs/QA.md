@@ -299,3 +299,14 @@ A（本次已落地）:
   - 新增 `swarm` 模式（stack deploy + readiness gate）
 - 新增 Swarm stack 模板：`platform-deploy/swarm/stack.yml`（镜像/端口/副本可通过环境变量注入）
 - 文档补充：`platform-deploy/README.md` 增加 Remote Docker / Swarm 使用示例
+
+## 2026-02-10 - 集群实验场：补齐 k3d（k3s）本地集群 lab 脚本
+
+Q（继续补全）:
+- 部署/验证矩阵包含 k3s；希望本地可复现一键起集群 + 部署样例服务，作为集群并发/回归的实验场
+
+A（本次已落地）:
+- 新增 k3d lab（k3s in Docker）：`platform-loadtest/k3d/lab.sh`、`platform-loadtest/k3d/lab.ps1`
+  - 创建 k3d 集群（如不存在） -> 构建 sample jar -> 构建镜像 -> `k3d image import` -> Helm 部署 -> rollout gate
+  - Bash 版本支持 `RUN_SMOKE=1` 自动 port-forward + readiness + k6 + Python 黑盒验证
+- 文档补充：`platform-loadtest/README.md` 增加 k3d lab 入口说明
