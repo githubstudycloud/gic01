@@ -3,8 +3,16 @@ param(
   [ValidateSet("fast", "standard", "full")]
   [string]$Level = "standard",
 
+  [ValidateSet("docker", "compose", "swarm", "k8s")]
+  [string]$DeployMode = $(if ([string]::IsNullOrWhiteSpace($env:DEPLOY_MODE)) { "docker" } else { $env:DEPLOY_MODE }),
+
   [int]$JavaVersion = 21,
   [int]$HostPort = 18080,
+  [string]$BaseUrl = $env:BASE_URL,
+  [string]$HealthUrl = $env:HEALTH_URL,
+  [string]$DockerContext = $env:DOCKER_CONTEXT,
+  [string]$Image,
+  [switch]$SkipCleanup,
 
   [switch]$SkipDocker,
   [switch]$SkipK6,
@@ -31,13 +39,32 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $deployScript = Join-Path $repoRoot "platform-deploy\\deploy.ps1"
 $k6Script = Join-Path $repoRoot "platform-loadtest\\run-k6.ps1"
 $depsAudit = Join-Path $repoRoot "scripts\\deps-age-audit.ps1"
+$verifyHttp = Join-Path $repoRoot "platform-deploy\\verify-http.ps1"
 
 RequireCommand mvn
 
+$baseUrlInput = $BaseUrl
+if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
+  $BaseUrl = "http://localhost:$HostPort"
+}
+if ([string]::IsNullOrWhiteSpace($HealthUrl)) {
+  $HealthUrl = "$BaseUrl/actuator/health/readiness"
+}
+$contextLabel = "<default>"
+if (-not [string]::IsNullOrWhiteSpace($DockerContext)) {
+  $contextLabel = $DockerContext
+}
+
 Write-Host "Release verify"
 Write-Host "  Level:      $Level"
+Write-Host "  DeployMode: $DeployMode"
 Write-Host "  Java:       $JavaVersion"
 Write-Host "  HostPort:   $HostPort"
+Write-Host "  BaseUrl:    $BaseUrl"
+Write-Host "  HealthUrl:  $HealthUrl"
+Write-Host "  Context:    $contextLabel"
+Write-Host "  Image:      $Image"
+Write-Host "  Cleanup:    $(-not $SkipCleanup)"
 Write-Host "  SkipDocker: $SkipDocker"
 Write-Host "  SkipK6:     $SkipK6"
 Write-Host "  SkipPython: $SkipPython"
@@ -75,10 +102,20 @@ try {
     return
   }
 
-  RequireCommand docker
+  $needsDocker = ($DeployMode -ne "k8s") -or (-not $SkipK6)
+  if ($needsDocker) {
+    RequireCommand docker
+  }
 
   $serviceName = "platform-sample-verify"
-  $baseUrl = "http://localhost:$HostPort"
+  $baseUrl = $BaseUrl
+
+  if ($DeployMode -eq "k8s" -and [string]::IsNullOrWhiteSpace($baseUrlInput)) {
+    throw "For -DeployMode k8s, provide -BaseUrl (ingress or port-forward URL) and -Image (registry image recommended)."
+  }
+  if ($DeployMode -eq "k8s" -and [string]::IsNullOrWhiteSpace($Image)) {
+    throw "For -DeployMode k8s, provide -Image (registry image recommended)."
+  }
 
   # Ensure we have a sample app jar to build the Docker image from.
   $jar = Get-ChildItem (Join-Path $repoRoot "platform-sample-app\\target") -Filter "platform-sample-app-*.jar" -ErrorAction SilentlyContinue |
@@ -101,8 +138,13 @@ try {
 
   try {
     Write-Host ""
-    Write-Host "[3/5] Docker deploy + readiness gate..."
-    & $deployScript -Mode docker -ServiceName $serviceName -JarPath "platform-sample-app/target/$($jar.Name)" -HostPort $HostPort -JavaVersion $JavaVersion
+    Write-Host "[3/5] Deploy ($DeployMode) + readiness gate..."
+    if ($DeployMode -eq "k8s") {
+      & $deployScript -Mode k8s -ServiceName $serviceName -Image $Image -DockerContext $DockerContext
+      & $verifyHttp -Url $HealthUrl -TimeoutSeconds 120
+    } else {
+      & $deployScript -Mode $DeployMode -ServiceName $serviceName -JarPath "platform-sample-app/target/$($jar.Name)" -HostPort $HostPort -JavaVersion $JavaVersion -DockerContext $DockerContext -HealthUrl $HealthUrl
+    }
 
     if (-not $SkipK6) {
       Write-Host ""
@@ -141,10 +183,27 @@ try {
       Write-Host ""
       Write-Host "Full level note: for cluster verification, run:"
       Write-Host "  ./platform-loadtest/kind/lab.ps1"
+      Write-Host "  ./platform-loadtest/k3d/lab.ps1"
       Write-Host "  ./platform-loadtest/run-k6.ps1 -Script ping-smoke -BaseUrl http://localhost:8080 ..."
     }
   } finally {
-    docker rm -f $serviceName 2>$null | Out-Null
+    if (-not $SkipCleanup) {
+      $docker = @("docker")
+      if (-not [string]::IsNullOrWhiteSpace($DockerContext)) {
+        $docker += @("--context", $DockerContext)
+      }
+
+      switch ($DeployMode) {
+        "docker" { & $docker rm -f $serviceName 2>$null | Out-Null }
+        "compose" { & $docker compose -f (Join-Path $repoRoot "platform-deploy\\compose\\docker-compose.yml") --project-name $serviceName down -v 2>$null | Out-Null }
+        "swarm" { & $docker stack rm $serviceName 2>$null | Out-Null }
+        "k8s" {
+          if (Get-Command helm -ErrorAction SilentlyContinue) {
+            & helm uninstall $serviceName -n "default" 2>$null | Out-Null
+          }
+        }
+      }
+    }
   }
 } finally {
   Pop-Location

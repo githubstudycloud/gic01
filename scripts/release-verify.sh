@@ -2,12 +2,16 @@
 set -euo pipefail
 
 LEVEL="${LEVEL:-standard}" # fast|standard|full
+DEPLOY_MODE="${DEPLOY_MODE:-docker}" # docker|compose|swarm|k8s
 JAVA_VERSION="${JAVA_VERSION:-21}"
 HOST_PORT="${HOST_PORT:-18080}"
+DOCKER_CONTEXT="${DOCKER_CONTEXT:-}"
 
 SKIP_DOCKER="${SKIP_DOCKER:-0}"
 SKIP_K6="${SKIP_K6:-0}"
 SKIP_PYTHON="${SKIP_PYTHON:-0}"
+SKIP_BUILD_IMAGE="${SKIP_BUILD_IMAGE:-0}"
+CLEANUP="${CLEANUP:-1}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -15,11 +19,15 @@ cd "${ROOT_DIR}"
 
 echo "Release verify"
 echo "  Level:      ${LEVEL}"
+echo "  DeployMode: ${DEPLOY_MODE}"
 echo "  Java:       ${JAVA_VERSION}"
 echo "  HostPort:   ${HOST_PORT}"
+echo "  Context:    ${DOCKER_CONTEXT:-<default>}"
 echo "  SkipDocker: ${SKIP_DOCKER}"
 echo "  SkipK6:     ${SKIP_K6}"
 echo "  SkipPython: ${SKIP_PYTHON}"
+echo "  SkipBuild:  ${SKIP_BUILD_IMAGE}"
+echo "  Cleanup:    ${CLEANUP}"
 
 command -v mvn >/dev/null 2>&1 || { echo "mvn not found in PATH" >&2; exit 2; }
 
@@ -48,10 +56,67 @@ if [[ "${SKIP_DOCKER}" == "1" ]]; then
   exit 0
 fi
 
-command -v docker >/dev/null 2>&1 || { echo "docker not found in PATH" >&2; exit 2; }
+docker_cmd=(docker)
+if [[ -n "${DOCKER_CONTEXT}" ]]; then
+  docker_cmd+=(--context "${DOCKER_CONTEXT}")
+fi
 
-SERVICE_NAME="platform-sample-verify"
-BASE_URL="http://localhost:${HOST_PORT}"
+needs_docker=0
+if [[ "${DEPLOY_MODE}" != "k8s" ]]; then
+  needs_docker=1
+fi
+if [[ "${SKIP_K6}" != "1" ]]; then
+  needs_docker=1
+fi
+if [[ "${needs_docker}" == "1" ]]; then
+  command -v docker >/dev/null 2>&1 || { echo "docker not found in PATH" >&2; exit 2; }
+fi
+
+SERVICE_NAME="${SERVICE_NAME:-platform-sample-verify}"
+BASE_URL_INPUT="${BASE_URL-}"
+BASE_URL="${BASE_URL_INPUT:-http://localhost:${HOST_PORT}}"
+HEALTH_URL_INPUT="${HEALTH_URL-}"
+HEALTH_URL="${HEALTH_URL_INPUT:-${BASE_URL}/actuator/health/readiness}"
+IMAGE_INPUT="${IMAGE-}"
+IMAGE="${IMAGE_INPUT:-platform-sample-app:verify}"
+STACK_NAME="${STACK_NAME:-$SERVICE_NAME}"
+NAMESPACE="${NAMESPACE:-default}"
+RELEASE="${RELEASE:-$SERVICE_NAME}"
+
+cleanup() {
+  if [[ "${CLEANUP}" != "1" ]]; then
+    return 0
+  fi
+
+  case "${DEPLOY_MODE}" in
+    docker)
+      "${docker_cmd[@]}" rm -f "${SERVICE_NAME}" >/dev/null 2>&1 || true
+      ;;
+    compose)
+      "${docker_cmd[@]}" compose -f "${ROOT_DIR}/platform-deploy/compose/docker-compose.yml" --project-name "${SERVICE_NAME}" down -v >/dev/null 2>&1 || true
+      ;;
+    swarm)
+      "${docker_cmd[@]}" stack rm "${STACK_NAME}" >/dev/null 2>&1 || true
+      ;;
+    k8s)
+      if command -v helm >/dev/null 2>&1; then
+        helm uninstall "${RELEASE}" -n "${NAMESPACE}" >/dev/null 2>&1 || true
+      fi
+      ;;
+  esac
+}
+trap cleanup EXIT
+
+if [[ "${DEPLOY_MODE}" == "k8s" && -z "${BASE_URL_INPUT}" ]]; then
+  echo "For DEPLOY_MODE=k8s, set BASE_URL (ingress or port-forward URL), e.g.:" >&2
+  echo "  BASE_URL=http://localhost:8080 DEPLOY_MODE=k8s IMAGE=your-registry/app:1.0.0 ./scripts/release-verify.sh" >&2
+  exit 2
+fi
+
+if [[ "${DEPLOY_MODE}" == "k8s" && -z "${IMAGE_INPUT}" ]]; then
+  echo "For DEPLOY_MODE=k8s, set IMAGE explicitly (registry image recommended)." >&2
+  exit 2
+fi
 
 JAR_FILE="$(ls -t "${ROOT_DIR}/platform-sample-app/target/platform-sample-app-"*.jar 2>/dev/null | head -n 1 || true)"
 if [[ -z "${JAR_FILE}" ]]; then
@@ -61,26 +126,25 @@ if [[ -z "${JAR_FILE}" ]]; then
   JAR_FILE="$(ls -t "${ROOT_DIR}/platform-sample-app/target/platform-sample-app-"*.jar | head -n 1)"
 fi
 
-IMAGE="platform-sample-app:verify"
-DOCKERFILE="${ROOT_DIR}/platform-deploy/docker/Dockerfile.jvm"
+if [[ "${DEPLOY_MODE}" != "k8s" && "${SKIP_BUILD_IMAGE}" != "1" ]]; then
+  DOCKERFILE="${ROOT_DIR}/platform-deploy/docker/Dockerfile.jvm"
 
-cleanup() {
-  docker rm -f "${SERVICE_NAME}" >/dev/null 2>&1 || true
-}
-trap cleanup EXIT
+  echo ""
+  echo "[3/5] Build Docker image..."
+  "${docker_cmd[@]}" build \
+    -f "${DOCKERFILE}" \
+    --build-arg "JAVA_VERSION=${JAVA_VERSION}" \
+    --build-arg "JAR_FILE=platform-sample-app/target/$(basename "${JAR_FILE}")" \
+    -t "${IMAGE}" \
+    "${ROOT_DIR}"
+fi
 
 echo ""
-echo "[3/5] Docker deploy + readiness gate..."
-docker build \
-  -f "${DOCKERFILE}" \
-  --build-arg "JAVA_VERSION=${JAVA_VERSION}" \
-  --build-arg "JAR_FILE=platform-sample-app/target/$(basename "${JAR_FILE}")" \
-  -t "${IMAGE}" \
-  "${ROOT_DIR}"
-
-docker rm -f "${SERVICE_NAME}" >/dev/null 2>&1 || true
-docker run -d --name "${SERVICE_NAME}" -p "${HOST_PORT}:8080" "${IMAGE}" >/dev/null
-./platform-deploy/verify-http.sh "http://localhost:${HOST_PORT}/actuator/health/readiness" 60
+echo "[3/5] Deploy (${DEPLOY_MODE}) + readiness gate..."
+HOST_PORT="${HOST_PORT}" HEALTH_URL="${HEALTH_URL}" \
+  DOCKER_CONTEXT="${DOCKER_CONTEXT}" STACK_NAME="${STACK_NAME}" \
+  NAMESPACE="${NAMESPACE}" RELEASE="${RELEASE}" \
+  ./platform-deploy/deploy.sh "${DEPLOY_MODE}" "${SERVICE_NAME}" "${IMAGE}"
 
 if [[ "${SKIP_K6}" != "1" ]]; then
   echo ""
@@ -115,4 +179,3 @@ if [[ "${LEVEL}" == "full" ]]; then
   echo "  ./platform-loadtest/kind/lab.sh"
   echo "  ./platform-loadtest/run-k6.sh ping-smoke http://localhost:8080 ..."
 fi
-
