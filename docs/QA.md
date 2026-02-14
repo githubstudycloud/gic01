@@ -346,3 +346,15 @@ A（本次检查与修复）:
 - 文档补全与对齐：
   - `docs/getting-started.md`：补充 Docker daemon 依赖说明、`release-verify` 多部署模式、WSL smoke、`publish-image`、k3d 实验场入口
   - `README.md`：补充 IT/Testcontainers 与 Docker 依赖说明、release-verify 快速入口
+
+## 2026-02-14 - 在 WSL 跑全链路：mvn test / it verify / WSL smoke
+
+Q（用户需求摘要）:
+- 要求用 WSL 跑一遍，确认文档中的命令能完整执行、覆盖测试用例
+
+A（执行结果）:
+- WSL（Ubuntu-22.04）下执行通过：
+  - `mvn -q test`
+  - `mvn -q -Pit verify`（Testcontainers 能正常连接 Docker 并启动 `redis:7-alpine` IT）
+  - `./platform-deploy/wsl/smoke.sh`（readiness gate + Python 黑盒：`6 passed`）
+- 备注：WSL 会间歇提示 “Failed to start the systemd user session”，不影响上述命令执行
