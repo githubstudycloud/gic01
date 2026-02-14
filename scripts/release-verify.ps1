@@ -28,10 +28,10 @@ function RequireCommand([string]$name) {
   }
 }
 
-function ExecNative([string]$file, [string[]]$args) {
-  & $file @args
+function ExecNative([string]$file, [string[]]$argv) {
+  & $file @argv
   if ($LASTEXITCODE -ne 0) {
-    throw "Command failed with exit code $LASTEXITCODE: $file $($args -join ' ')"
+    throw "Command failed with exit code ${LASTEXITCODE}: $file $($argv -join ' ')"
   }
 }
 

@@ -151,7 +151,7 @@ switch ($Mode) {
       $tag = $Matches[2]
     }
 
-    Write-Host "Deploying via Helm: $Release ($repo:$tag) ns=$Namespace"
+    Write-Host "Deploying via Helm: $Release (${repo}:${tag}) ns=$Namespace"
     $helmArgs = @(
       "upgrade", "--install", $Release, $ChartPath,
       "-n", $Namespace, "--create-namespace",

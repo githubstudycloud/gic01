@@ -30,9 +30,9 @@ function RequireLastExitCode([string]$what) {
   }
 }
 
-function ExecNative([string]$file, [string[]]$args) {
-  & $file @args | Out-Host
-  RequireLastExitCode "$file $($args -join ' ')"
+function ExecNative([string]$file, [string[]]$argv) {
+  & $file @argv | Out-Host
+  RequireLastExitCode "$file $($argv -join ' ')"
 }
 
 RequireCommand mvn
@@ -132,4 +132,3 @@ try {
 } finally {
   Pop-Location
 }
-
