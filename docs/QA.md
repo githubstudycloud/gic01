@@ -328,3 +328,21 @@ A（本次已落地）:
 - 新增发布辅助脚本（构建 jar -> 构建镜像 -> 可选 push -> 输出 digest 与部署命令）：
   - `scripts/publish-image.sh`
   - `scripts/publish-image.ps1`
+
+## 2026-02-14 - 文档/脚本可运行性检查：修复 PowerShell 脚本错误 + 补全新手引导
+
+Q（用户需求摘要）:
+- 先记录后续事项，暂时不展开
+- 现在检查：文档里的命令/脚本是否可完整运行、测试用例是否可覆盖执行，并确保有完整的新手引导说明文档
+
+A（本次检查与修复）:
+- 测试链路检查：
+  - `mvn -q test` 通过
+  - `mvn -q -Pit verify` 通过（Docker daemon 未启动时，Testcontainers 相关 IT 会被跳过；已在引导文档中明确）
+  - `./scripts/release-verify.ps1 -Level fast` 可运行（用于验证脚本入口本身可执行）
+- 修复 PowerShell 脚本可运行性问题：
+  - `platform-deploy/deploy.ps1`：修复字符串插值中 `$repo:$tag` 的解析错误
+  - `scripts/release-verify.ps1` / `scripts/publish-image.ps1`：修复 `$LASTEXITCODE:` 字符串解析问题，并避免函数参数名 `$args` 与自动变量冲突导致的 splat 失效
+- 文档补全与对齐：
+  - `docs/getting-started.md`：补充 Docker daemon 依赖说明、`release-verify` 多部署模式、WSL smoke、`publish-image`、k3d 实验场入口
+  - `README.md`：补充 IT/Testcontainers 与 Docker 依赖说明、release-verify 快速入口
