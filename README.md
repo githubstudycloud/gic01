@@ -27,10 +27,18 @@ Run integration tests (if/when added):
 mvn -q -Pit verify
 ```
 
+Note: some ITs use Testcontainers; Docker daemon is required to actually run them (otherwise they are skipped).
+
 Enable Java 21 compilation (optional, requires JDK 21+):
 
 ```bash
 mvn -q -Pjava21 test
+```
+
+## Release verify (optional)
+
+```powershell
+./scripts/release-verify.ps1 -Level standard
 ```
 
 ## Gradle consumption

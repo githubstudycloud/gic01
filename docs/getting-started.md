@@ -6,7 +6,7 @@
 
 - JDK 17+（推荐本地/生产运行 JDK 21）
 - Maven 3.9+
-- 可选：Docker（用于 adapter 集成测试 / 本地依赖栈）
+- 可选：Docker（用于 adapter 集成测试 / `release-verify` 的 Docker 部署门禁 / 本地依赖栈；需 Docker daemon 正常运行）
 
 ## 1. 一键验证（最小化）
 
@@ -21,6 +21,8 @@ mvn -q test
 mvn -q -Pit verify
 ```
 
+说明：本仓库的部分 IT 使用 Testcontainers。若 Docker 未启动，这类 IT 会被跳过（最小化验证链路不受影响）。
+
 如果你希望编译目标为 Java 21（可选，需要 JDK 21+）：
 
 ```bash
@@ -34,6 +36,39 @@ mvn -q -Pjava21 test
 ```powershell
 ./scripts/release-verify.ps1 -Level standard
 ```
+
+多部署模式（可选）：
+
+```powershell
+# 最轻量（无 Docker）：单测 + 依赖年龄审计
+./scripts/release-verify.ps1 -Level fast
+
+# 标准：docker/compose/swarm（需要 Docker daemon）
+./scripts/release-verify.ps1 -Level standard -DeployMode docker
+./scripts/release-verify.ps1 -Level standard -DeployMode compose
+./scripts/release-verify.ps1 -Level standard -DeployMode swarm
+
+# k8s：需要提供可访问的 BaseUrl（Ingress 或 port-forward）+ registry 镜像（推荐 digest）
+./scripts/release-verify.ps1 -Level standard -DeployMode k8s -BaseUrl http://localhost:8080 -Image your-registry/app@sha256:deadbeef...
+```
+
+## 1.6 Windows + WSL 一键 smoke（可选）
+
+如果你在 Windows 上希望用 WSL（Ubuntu）跑 “构建 -> Docker 部署 -> readiness gate -> Python 黑盒” 一条龙：
+
+```bash
+./platform-deploy/wsl/smoke.sh
+```
+
+## 1.7 构建/推送镜像（可选）
+
+用于发布到远程 Docker / Swarm / K8s 的最小脚手架（构建 jar -> 构建镜像 -> 可选 push -> 输出 digest）：
+
+```powershell
+./scripts/publish-image.ps1 -ImageRepo your-registry/platform-sample -ImageTag 0.1.0 -Push
+```
+
+更多部署方式与参数见：`platform-deploy/README.md`。
 
 ## 2. 跑一个最小可运行样例
 
@@ -119,5 +154,6 @@ pytest
 
 - k6（轻量并发/压测）：`platform-loadtest/run-k6.ps1`、`platform-loadtest/run-k6.sh`
 - kind（本地 K8s 实验场）：`platform-loadtest/kind/lab.ps1`、`platform-loadtest/kind/lab.sh`
+- k3d/k3s（本地 K8s 实验场）：`platform-loadtest/k3d/lab.ps1`、`platform-loadtest/k3d/lab.sh`
 
 详见：`platform-loadtest/README.md`
